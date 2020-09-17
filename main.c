@@ -1,0 +1,243 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: nsondag <nsondag@student.s19.be>           +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/09/15 20:48:33 by nsondag           #+#    #+#             */
+/*   Updated: 2020/09/15 20:48:38 by nsondag          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
+#include <math.h>
+
+/* Padding:
+  Message must have a length multiple of 512 and contain the length
+  of the original message
+  First add a 1 bit after the message, then 0 until multiple of 512,
+  except for the last 64 bits who will contain de original length of the message
+*/
+
+unsigned char *padding(char *message)
+{
+  unsigned char *padded_message;
+  int init_len;
+  int new_len;
+  int i = 0;
+
+  padded_message = malloc(128 * sizeof(*padded_message));
+  bzero(padded_message, 128);
+  init_len = strlen(message);
+  memcpy(padded_message, message, init_len);
+  padded_message[init_len] = 0b10000000;
+  uint32_t bits_len = 8 * init_len; // need to be inversed?
+  i = 0;
+  memcpy(padded_message + 56, &bits_len, 8);// in bits at the end of the buffer
+  new_len = strlen((char*)padded_message);
+  new_len = ((((init_len + 8) / 64) + 1) * 64) - 8; // need explanation
+  memcpy(padded_message + new_len, &bits_len, 4); //idem
+  return (padded_message);
+}
+
+uint32_t aux_f(uint32_t x, int32_t y, uint32_t z)
+{
+  return((x & y) | (~x & z));
+}
+
+uint32_t aux_g(uint32_t x, uint32_t y, uint32_t z)
+{
+  return((x & z) | (y & (~z)));
+}
+
+uint32_t aux_h(uint32_t x, uint32_t y, uint32_t z)
+{
+  return(x ^ y ^ z);
+}
+
+uint32_t aux_i(uint32_t x, uint32_t y, uint32_t z)
+{
+  return(y ^ (x | ~z));
+}
+
+uint32_t left_rot(uint32_t a, int s)
+{
+  unsigned  mask1 = (1 << s) - 1;
+	return ((a >> (32 - s)) & mask1) | ((a << s) & ~mask1); //˜ bitwise complement 
+}
+
+uint32_t r1(uint32_t a, uint32_t b, uint32_t c, uint32_t d, char *x, int s, int i, unsigned long tab[64])
+{
+  printf("x: %s\n", x);
+  a = (b + left_rot(a + aux_f(b, c, d) + (int)x + tab[i], s)) % 4294967296;
+  return (a);
+}
+
+uint32_t r2(uint32_t a, uint32_t b, uint32_t c, uint32_t d, char *x, int s, int i, unsigned long tab[64])
+{
+  a = (b + left_rot(a + aux_g(b, c, d) + (int)x + tab[i], s)) % 4294967296;
+  return (a);
+}
+
+uint32_t r3(int a, int b, int c, int d, char *x, int s, int i, unsigned long tab[64])
+{
+  a = (b + left_rot(a + aux_h(b, c, d) + (int)x + tab[i], s)) % 4294967296;
+  return (a);
+}
+
+uint32_t r4(int a, int b, int c, int d, char *x, int s, int i, unsigned long tab[64])
+{
+  a = (b + left_rot(a + aux_i(b, c, d) + (int)x + tab[i], s)) % 4294967296;
+  return (a);
+}
+
+uint32_t ft_md5(unsigned char *string)
+{
+  uint32_t a = 0x67452301;
+  uint32_t b = 0xefcdab89;
+  uint32_t c = 0x98badcfe;
+  uint32_t d = 0x10325476;
+  int i = 0;
+  int j = 0;
+  int k = 0;
+  int l = 0;
+  uint32_t tmp_a = 0;
+  uint32_t tmp_b = 0;
+  uint32_t tmp_c = 0;
+  uint32_t tmp_d = 0;
+  char x[16][32];
+  //int s1[4] = {7, 12, 17, 22};
+  //int s2[4] = {5, 9, 14, 20};
+  //int s3[4] = {4, 11, 16, 23};
+  //int s4[4] = {6, 10, 15, 21};
+  k = 0;
+  printf("a %u\n", a);
+  printf("b %u\n", b);
+  printf("c %u\n", c);
+  printf("d %u\n", d);
+  unsigned long tab[64];
+  while (l < 64)
+  {
+    tab[l] = (unsigned long)(fabs(sin(l + 1)) * pow(2, 32));
+    l++;
+  }
+  while (i < 512)
+  {
+      tmp_a = a;
+      tmp_b = b;
+      tmp_c = c;
+      tmp_d = d;
+      j = 0;
+      while(j < 16)
+      {
+        printf("j: %d\n", j);
+        printf("i mod 32 %d\n", i % 32);
+        x[j][i % 32] = string[i * 16 + j];
+        j++;
+      }
+      i++;
+  }
+
+  a = r1(a, b, c, d, x[0], 7, 1, tab);
+  printf("%u\n", a);
+  d = r1(d, a, b, c, x[1], 12, 2, tab);
+  c = r1(c, d, a, b, x[2], 17, 3, tab);
+  b = r1(b, c, d, a, x[3], 22, 4, tab);
+  a = r1(a, b, c, d, x[4], 7, 5, tab);
+  d = r1(d, a, b, c, x[5], 12, 6, tab);
+  c = r1(c, d, a, b, x[6], 17, 7, tab);
+  b = r1(b, c, d, a, x[7], 22, 8, tab);
+  a = r1(a, b, c, d, x[8], 7, 9, tab);
+  d = r1(d, a, b, c, x[9], 12, 10, tab);
+  c = r1(c, d, a, b, x[10], 17, 11, tab);
+  b = r1(b, c, d, a, x[11], 22, 12, tab);
+  a = r1(a, b, c, d, x[12], 7, 13, tab);
+  d = r1(d, a, b, c, x[13], 12, 14, tab);
+  c = r1(c, d, a, b, x[14], 17, 15, tab);
+  b = r1(b, c, d, a, x[15], 22, 16, tab);
+
+  a = r2(a, b, c, d, x[1], 5, 17, tab);
+  d = r2(d, a, b, c, x[6], 9, 18, tab);
+  c = r2(c, d, a, b, x[11], 14, 19, tab);
+  b = r2(b, c, d, a, x[0], 20, 20, tab);
+  a = r2(a, b, c, d, x[5], 5, 21, tab);
+  d = r2(d, a, b, c, x[10], 9, 22, tab);
+  c = r2(c, d, a, b, x[15], 14, 23, tab);
+  b = r2(b, c, d, a, x[4], 20, 24, tab);
+  a = r2(a, b, c, d, x[9], 5, 25, tab);
+  d = r2(d, a, b, c, x[14], 9, 26, tab);
+  c = r2(c, d, a, b, x[3], 14, 27, tab);
+  b = r2(b, c, d, a, x[8], 20, 28, tab);
+  a = r2(a, b, c, d, x[13], 5, 29, tab);
+  d = r2(d, a, b, c, x[2], 9, 30, tab);
+  c = r2(c, d, a, b, x[7], 14, 31, tab);
+  b = r2(b, c, d, a, x[12], 20, 32, tab);
+
+  a = r3(a, b, c, d, x[0], 4, 33, tab);
+  d = r3(d, a, b, c, x[1], 11, 34, tab);
+  c = r3(c, d, a, b, x[2], 16, 35, tab);
+  b = r3(b, c, d, a, x[3], 23, 36, tab);
+  a = r3(a, b, c, d, x[4], 4, 37, tab);
+  d = r3(d, a, b, c, x[5], 11, 38, tab);
+  c = r3(c, d, a, b, x[6], 16, 39, tab);
+  b = r3(b, c, d, a, x[7], 23, 40, tab);
+  a = r3(a, b, c, d, x[8], 4, 41, tab);
+  d = r3(d, a, b, c, x[9], 11, 42, tab);
+  c = r3(c, d, a, b, x[10], 16, 43, tab);
+  b = r3(b, c, d, a, x[11], 23, 44, tab);
+  a = r3(a, b, c, d, x[12], 4, 45, tab);
+  d = r3(d, a, b, c, x[13], 11, 46, tab);
+  c = r3(c, d, a, b, x[14], 16, 47, tab);
+  b = r3(b, c, d, a, x[15], 23, 48, tab);
+
+  a = r4(a, b, c, d, x[0], 6, 49, tab);
+  d = r4(d, a, b, c, x[1], 10, 50, tab);
+  c = r4(c, d, a, b, x[2], 15, 51, tab);
+  b = r4(b, c, d, a, x[3], 21, 52, tab);
+  a = r4(a, b, c, d, x[4], 6, 53, tab);
+  d = r4(d, a, b, c, x[5], 10, 54, tab);
+  c = r4(c, d, a, b, x[6], 15, 55, tab);
+  b = r4(b, c, d, a, x[7], 21, 56, tab);
+  a = r4(a, b, c, d, x[8], 6, 57, tab);
+  d = r4(d, a, b, c, x[9], 10, 58, tab);
+  c = r4(c, d, a, b, x[10], 15, 59, tab);
+  b = r4(b, c, d, a, x[11], 21, 60, tab);
+  a = r4(a, b, c, d, x[12], 6, 61, tab);
+  d = r4(d, a, b, c, x[13], 10, 62, tab);
+  c = r4(c, d, a, b, x[14], 15, 63, tab);
+  b = r4(b, c, d, a, x[15], 21, 64, tab);
+
+a = a + tmp_a;
+b = b + tmp_b;
+c = c + tmp_c;
+d = d + tmp_d;
+printf("%x\n", a);
+printf("%x\n", b);
+printf("%x\n", c);
+printf("%x\n", d);
+return (0);
+}
+
+int main(int argc, char **argv)
+{
+  unsigned char *result;
+
+  if (argc < 2)
+  {
+      write(2, "usage\n", 6);
+      return (0);
+  }
+  else
+  {
+      //printf("%s\n", argv[1]);
+      result = padding(argv[1]);
+      printf("%s\n", argv[1]);
+      ft_md5(result);
+      printf("%s\n", result);
+  }
+  return (0);
+}
