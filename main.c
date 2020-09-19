@@ -70,28 +70,27 @@ uint32_t left_rot(uint32_t a, int s)
 	return ((a >> (32 - s)) & mask1) | ((a << s) & ~mask1); //˜ bitwise complement 
 }
 
-uint32_t r1(uint32_t a, uint32_t b, uint32_t c, uint32_t d, char *x, int s, int i, unsigned long tab[64])
+uint32_t r1(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, int s, int i, unsigned long tab[64])
 {
-  printf("x: %s\n", x);
-  a = (b + left_rot(a + aux_f(b, c, d) + (int)x + tab[i], s)) % 4294967296;
+  a = (b + left_rot((a + aux_f(b, c, d) + x + tab[i - 1]), s));
   return (a);
 }
 
-uint32_t r2(uint32_t a, uint32_t b, uint32_t c, uint32_t d, char *x, int s, int i, unsigned long tab[64])
+uint32_t r2(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, int s, int i, unsigned long tab[64])
 {
-  a = (b + left_rot(a + aux_g(b, c, d) + (int)x + tab[i], s)) % 4294967296;
+  a = (b + left_rot(a + aux_g(b, c, d) + x + tab[i - 1], s));
   return (a);
 }
 
-uint32_t r3(int a, int b, int c, int d, char *x, int s, int i, unsigned long tab[64])
+uint32_t r3(int a, int b, int c, int d, uint32_t x, int s, int i, unsigned long tab[64])
 {
-  a = (b + left_rot(a + aux_h(b, c, d) + (int)x + tab[i], s)) % 4294967296;
+  a = (b + left_rot(a + aux_h(b, c, d) + x + tab[i - 1], s));
   return (a);
 }
 
-uint32_t r4(int a, int b, int c, int d, char *x, int s, int i, unsigned long tab[64])
+uint32_t r4(int a, int b, int c, int d, uint32_t x, int s, int i, unsigned long tab[64])
 {
-  a = (b + left_rot(a + aux_i(b, c, d) + (int)x + tab[i], s)) % 4294967296;
+  a = (b + left_rot((a + aux_i(b, c, d) + x + tab[i - 1]), s));
   return (a);
 }
 
@@ -103,47 +102,42 @@ uint32_t ft_md5(unsigned char *string)
   uint32_t d = 0x10325476;
   int i = 0;
   int j = 0;
-  int k = 0;
   int l = 0;
   uint32_t tmp_a = 0;
   uint32_t tmp_b = 0;
   uint32_t tmp_c = 0;
   uint32_t tmp_d = 0;
-  char x[16][32];
+  uint32_t x[16] = {128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //''
+  //uint32_t x[16] = {1819043144, 1867980911, 1063545970, 1819043144, 1867980911, 744778866,
+  //  1699233568, 544173164, 1819438935, 1059073124, 1819043144, 1867980911, 744778866, 8404768, 432, 0};// "Hello World?Hello World, ?Hello World, ?Hello World, ?"
   //int s1[4] = {7, 12, 17, 22};
   //int s2[4] = {5, 9, 14, 20};
   //int s3[4] = {4, 11, 16, 23};
   //int s4[4] = {6, 10, 15, 21};
-  k = 0;
-  printf("a %u\n", a);
-  printf("b %u\n", b);
-  printf("c %u\n", c);
-  printf("d %u\n", d);
   unsigned long tab[64];
   while (l < 64)
   {
     tab[l] = (unsigned long)(fabs(sin(l + 1)) * pow(2, 32));
     l++;
   }
-  while (i < 512)
-  {
+  //while (i < 512)
+  //{
       tmp_a = a;
       tmp_b = b;
       tmp_c = c;
       tmp_d = d;
       j = 0;
-      while(j < 16)
-      {
-        printf("j: %d\n", j);
-        printf("i mod 32 %d\n", i % 32);
-        x[j][i % 32] = string[i * 16 + j];
-        j++;
-      }
-      i++;
-  }
-
+      //while(j < 16)
+      //{
+        //printf("j: %d\n", j);
+        //printf("i mod 32 %d\n", i % 32);
+        //x[j][i % 32] = string[i * 16 + j];
+        //x[j][i % 32] = 0;
+        //j++;
+      //}
+      //i++;
+  //}
   a = r1(a, b, c, d, x[0], 7, 1, tab);
-  printf("%u\n", a);
   d = r1(d, a, b, c, x[1], 12, 2, tab);
   c = r1(c, d, a, b, x[2], 17, 3, tab);
   b = r1(b, c, d, a, x[3], 22, 4, tab);
@@ -177,48 +171,49 @@ uint32_t ft_md5(unsigned char *string)
   c = r2(c, d, a, b, x[7], 14, 31, tab);
   b = r2(b, c, d, a, x[12], 20, 32, tab);
 
-  a = r3(a, b, c, d, x[0], 4, 33, tab);
-  d = r3(d, a, b, c, x[1], 11, 34, tab);
-  c = r3(c, d, a, b, x[2], 16, 35, tab);
-  b = r3(b, c, d, a, x[3], 23, 36, tab);
-  a = r3(a, b, c, d, x[4], 4, 37, tab);
-  d = r3(d, a, b, c, x[5], 11, 38, tab);
-  c = r3(c, d, a, b, x[6], 16, 39, tab);
-  b = r3(b, c, d, a, x[7], 23, 40, tab);
-  a = r3(a, b, c, d, x[8], 4, 41, tab);
-  d = r3(d, a, b, c, x[9], 11, 42, tab);
-  c = r3(c, d, a, b, x[10], 16, 43, tab);
-  b = r3(b, c, d, a, x[11], 23, 44, tab);
-  a = r3(a, b, c, d, x[12], 4, 45, tab);
-  d = r3(d, a, b, c, x[13], 11, 46, tab);
-  c = r3(c, d, a, b, x[14], 16, 47, tab);
-  b = r3(b, c, d, a, x[15], 23, 48, tab);
+  a = r3(a, b, c, d, x[5], 4, 33, tab);
+  d = r3(d, a, b, c, x[8], 11, 34, tab);
+  c = r3(c, d, a, b, x[11], 16, 35, tab);
+  b = r3(b, c, d, a, x[14], 23, 36, tab);
+  a = r3(a, b, c, d, x[1], 4, 37, tab);
+  d = r3(d, a, b, c, x[4], 11, 38, tab);
+  c = r3(c, d, a, b, x[7], 16, 39, tab);
+  b = r3(b, c, d, a, x[10], 23, 40, tab);
+  a = r3(a, b, c, d, x[13], 4, 41, tab);
+  d = r3(d, a, b, c, x[0], 11, 42, tab);
+  c = r3(c, d, a, b, x[3], 16, 43, tab);
+  b = r3(b, c, d, a, x[6], 23, 44, tab);
+  a = r3(a, b, c, d, x[9], 4, 45, tab);
+  d = r3(d, a, b, c, x[12], 11, 46, tab);
+  c = r3(c, d, a, b, x[15], 16, 47, tab);
+  b = r3(b, c, d, a, x[2], 23, 48, tab);
 
   a = r4(a, b, c, d, x[0], 6, 49, tab);
-  d = r4(d, a, b, c, x[1], 10, 50, tab);
-  c = r4(c, d, a, b, x[2], 15, 51, tab);
-  b = r4(b, c, d, a, x[3], 21, 52, tab);
-  a = r4(a, b, c, d, x[4], 6, 53, tab);
-  d = r4(d, a, b, c, x[5], 10, 54, tab);
-  c = r4(c, d, a, b, x[6], 15, 55, tab);
-  b = r4(b, c, d, a, x[7], 21, 56, tab);
+  d = r4(d, a, b, c, x[7], 10, 50, tab);
+  c = r4(c, d, a, b, x[14], 15, 51, tab);
+  b = r4(b, c, d, a, x[5], 21, 52, tab);
+  a = r4(a, b, c, d, x[12], 6, 53, tab);
+  d = r4(d, a, b, c, x[3], 10, 54, tab);
+  c = r4(c, d, a, b, x[10], 15, 55, tab);
+  b = r4(b, c, d, a, x[1], 21, 56, tab);
   a = r4(a, b, c, d, x[8], 6, 57, tab);
-  d = r4(d, a, b, c, x[9], 10, 58, tab);
-  c = r4(c, d, a, b, x[10], 15, 59, tab);
-  b = r4(b, c, d, a, x[11], 21, 60, tab);
-  a = r4(a, b, c, d, x[12], 6, 61, tab);
-  d = r4(d, a, b, c, x[13], 10, 62, tab);
-  c = r4(c, d, a, b, x[14], 15, 63, tab);
-  b = r4(b, c, d, a, x[15], 21, 64, tab);
+  d = r4(d, a, b, c, x[15], 10, 58, tab);
+  c = r4(c, d, a, b, x[6], 15, 59, tab);
+  b = r4(b, c, d, a, x[13], 21, 60, tab);
+  a = r4(a, b, c, d, x[4], 6, 61, tab);
+  d = r4(d, a, b, c, x[11], 10, 62, tab);
+  c = r4(c, d, a, b, x[2], 15, 63, tab);
+  b = r4(b, c, d, a, x[9], 21, 64, tab);
 
 a = a + tmp_a;
 b = b + tmp_b;
 c = c + tmp_c;
 d = d + tmp_d;
-printf("%x\n", a);
-printf("%x\n", b);
-printf("%x\n", c);
-printf("%x\n", d);
+printf("%u | %x\n", a, a);
+printf("%u | %x\n", b, b);
+printf("%u | %x\n", c, c);
+printf("%u | %x\n", d, d);
+// for result convert a, b, c, d to little endian and add them as a string
 return (0);
 }
 
@@ -235,9 +230,9 @@ int main(int argc, char **argv)
   {
       //printf("%s\n", argv[1]);
       result = padding(argv[1]);
-      printf("%s\n", argv[1]);
+      //printf("%s\n", argv[1]);
       ft_md5(result);
-      printf("%s\n", result);
+      //printf("%s\n", result);
   }
   return (0);
 }
