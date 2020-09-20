@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "../includes/md5.h"
+
 /* Padding:
   Message must have a length multiple of 512 and contain the length
   of the original message
@@ -18,25 +19,35 @@
   except for the last 64 bits who will contain de original length of the message
 */
 
-unsigned char *padding(char *message)
+uint32_t			rev_int_byte(uint32_t nbr)
 {
-  unsigned char *padded_message;
-  int init_len;
-  int new_len;
-  int i = 0;
+	return ((nbr & 0xff) << 24 | (nbr & 0xff0000) >> 8 |
+		(nbr & 0xff00) << 8 | (nbr & 0xff000000) >> 24);
+}
 
-  padded_message = malloc(128 * sizeof(*padded_message));
-  bzero(padded_message, 128);
-  init_len = strlen(message);
-  memcpy(padded_message, message, init_len);
-  padded_message[init_len] = 0b10000000;
-  uint32_t bits_len = 8 * init_len; // need to be inversed?
+union u_word *padding(char *message)
+{
+  union u_word *word;
+  int len;
+  int bit_len;
+  int i; // for debug
+
+  word = malloc(16 * sizeof(*word));
+  ft_bzero(word, 64);
+  len = ft_strlen(message);
+  bit_len = len * 8;
+  ft_memcpy(word, message, len);
+  word[len / 4].tab[len % 4] = 128;
+  ft_memcpy(word + 14, &bit_len, 4);
+  //*--DeBug
   i = 0;
-  memcpy(padded_message + 56, &bits_len, 8);// in bits at the end of the buffer
-  new_len = strlen((char*)padded_message);
-  new_len = ((((init_len + 8) / 64) + 1) * 64) - 8; // need explanation
-  memcpy(padded_message + new_len, &bits_len, 4); //idem
-  return (padded_message);
+  while (i < 16)
+  {
+    printf("%u\n", word[i].x);
+    i++;
+  }
+  //*/
+  return (word);
 }
 
 uint32_t r1(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, int s, int i, unsigned long tab[64])
@@ -63,12 +74,12 @@ uint32_t r4(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, int s, i
   return (a);
 }
 
-uint32_t ft_md5(unsigned char *string)
+uint32_t ft_md5(union u_word *string)
 {
-  uint32_t a = 0x67452301;
-  uint32_t b = 0xefcdab89;
-  uint32_t c = 0x98badcfe;
-  uint32_t d = 0x10325476;
+  uint32_t a = A;
+  uint32_t b = B;
+  uint32_t c = C;
+  uint32_t d = D;
   //int i = 0;
   int j = 0;
   int l = 0;
@@ -175,21 +186,18 @@ uint32_t ft_md5(unsigned char *string)
   c = r4(c, d, a, b, x[2], 15, 63, tab);
   b = r4(b, c, d, a, x[9], 21, 64, tab);
 
-a = a + tmp_a;
-b = b + tmp_b;
-c = c + tmp_c;
-d = d + tmp_d;
-printf("%u | %x\n", a, a);
-printf("%u | %x\n", b, b);
-printf("%u | %x\n", c, c);
-printf("%u | %x\n", d, d);
+a = rev_int_byte(a + tmp_a);
+b = rev_int_byte(b + tmp_b);
+c = rev_int_byte(c + tmp_c);
+d = rev_int_byte(d + tmp_d);
+printf("%x%x%x%x\n", a, b, c, d);
 // for result convert a, b, c, d to little endian and add them as a string
 return (0);
 }
 
 int main(int argc, char **argv)
 {
-  unsigned char *result;
+  union u_word *result;
 
   if (argc < 2)
   {
