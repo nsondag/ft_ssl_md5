@@ -10,12 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
-#include <math.h>
-
+#include "../includes/md5.h"
 /* Padding:
   Message must have a length multiple of 512 and contain the length
   of the original message
@@ -44,53 +39,27 @@ unsigned char *padding(char *message)
   return (padded_message);
 }
 
-uint32_t aux_f(uint32_t x, int32_t y, uint32_t z)
-{
-  return((x & y) | (~x & z));
-}
-
-uint32_t aux_g(uint32_t x, uint32_t y, uint32_t z)
-{
-  return((x & z) | (y & (~z)));
-}
-
-uint32_t aux_h(uint32_t x, uint32_t y, uint32_t z)
-{
-  return(x ^ y ^ z);
-}
-
-uint32_t aux_i(uint32_t x, uint32_t y, uint32_t z)
-{
-  return(y ^ (x | ~z));
-}
-
-uint32_t left_rot(uint32_t a, int s)
-{
-  unsigned  mask1 = (1 << s) - 1;
-	return ((a >> (32 - s)) & mask1) | ((a << s) & ~mask1); //˜ bitwise complement 
-}
-
 uint32_t r1(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, int s, int i, unsigned long tab[64])
 {
-  a = (b + left_rot((a + aux_f(b, c, d) + x + tab[i - 1]), s));
+  a = (b + left_rot((a + func_f(b, c, d) + x + tab[i - 1]), s));
   return (a);
 }
 
 uint32_t r2(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, int s, int i, unsigned long tab[64])
 {
-  a = (b + left_rot(a + aux_g(b, c, d) + x + tab[i - 1], s));
+  a = (b + left_rot(a + func_g(b, c, d) + x + tab[i - 1], s));
   return (a);
 }
 
-uint32_t r3(int a, int b, int c, int d, uint32_t x, int s, int i, unsigned long tab[64])
+uint32_t r3(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, int s, int i, unsigned long tab[64])
 {
-  a = (b + left_rot(a + aux_h(b, c, d) + x + tab[i - 1], s));
+  a = (b + left_rot(a + func_h(b, c, d) + x + tab[i - 1], s));
   return (a);
 }
 
-uint32_t r4(int a, int b, int c, int d, uint32_t x, int s, int i, unsigned long tab[64])
+uint32_t r4(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, int s, int i, unsigned long tab[64])
 {
-  a = (b + left_rot((a + aux_i(b, c, d) + x + tab[i - 1]), s));
+  a = (b + left_rot((a + func_i(b, c, d) + x + tab[i - 1]), s));
   return (a);
 }
 
@@ -100,7 +69,7 @@ uint32_t ft_md5(unsigned char *string)
   uint32_t b = 0xefcdab89;
   uint32_t c = 0x98badcfe;
   uint32_t d = 0x10325476;
-  int i = 0;
+  //int i = 0;
   int j = 0;
   int l = 0;
   uint32_t tmp_a = 0;
@@ -114,6 +83,7 @@ uint32_t ft_md5(unsigned char *string)
   //int s2[4] = {5, 9, 14, 20};
   //int s3[4] = {4, 11, 16, 23};
   //int s4[4] = {6, 10, 15, 21};
+  (void)string;
   unsigned long tab[64];
   while (l < 64)
   {
