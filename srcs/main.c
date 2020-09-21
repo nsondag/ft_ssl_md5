@@ -6,211 +6,123 @@
 /*   By: nsondag <nsondag@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/15 20:48:33 by nsondag           #+#    #+#             */
-/*   Updated: 2020/09/15 20:48:38 by nsondag          ###   ########.fr       */
+/*   Updated: 2020/09/21 21:17:54 by nsondag          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/md5.h"
 
 /* Padding:
-  Message must have a length multiple of 512 and contain the length
-  of the original message
-  First add a 1 bit after the message, then 0 until multiple of 512,
-  except for the last 64 bits who will contain de original length of the message
-*/
+   Message must have a length multiple of 512 and contain the length
+   of the original message
+   First add a 1 bit after the message, then 0 until multiple of 512,
+   except for the last 64 bits who will contain de original length of the message
+   */
 
 uint32_t			rev_int_byte(uint32_t nbr)
 {
 	return ((nbr & 0xff) << 24 | (nbr & 0xff0000) >> 8 |
-		(nbr & 0xff00) << 8 | (nbr & 0xff000000) >> 24);
+			(nbr & 0xff00) << 8 | (nbr & 0xff000000) >> 24);
 }
 
 union u_word *padding(char *message)
 {
-  union u_word *word;
-  int len;
-  int bit_len;
-  int i; // for debug
+	union u_word *word;
+	int len;
 
-  word = malloc(16 * sizeof(*word));
-  ft_bzero(word, 64);
-  len = ft_strlen(message);
-  bit_len = len * 8;
-  ft_memcpy(word, message, len);
-  word[len / 4].tab[len % 4] = 128;
-  ft_memcpy(word + 14, &bit_len, 4);
-  //*--DeBug
-  i = 0;
-  while (i < 16)
-  {
-    printf("%u\n", word[i].x);
-    i++;
-  }
-  //*/
-  return (word);
+	if (!(word = malloc(16 * sizeof(*word))))
+		return (NULL);
+	ft_bzero(word, 64);
+	len = ft_strlen(message) * 8;
+	ft_memcpy(word, message, len / 8);
+	word[len / 32].tab[(len / 8) % 4] = 128;
+	ft_memcpy(word + 14, &len, 4);
+	return (word);
 }
 
-uint32_t r1(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, int s, int i, unsigned long tab[64])
+uint32_t r1(uint32_t abcd[4], union u_word word[16], int s, int i, unsigned long tab[64])
 {
-  a = (b + left_rot((a + func_f(b, c, d) + x + tab[i - 1]), s));
-  return (a);
+	abcd[0] = (abcd[1] + left_rot((abcd[0] + func_f(abcd[1], abcd[2], abcd[3]) + word[i % 16].x + tab[i]), s));
+	return (abcd[0]);
 }
 
-uint32_t r2(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, int s, int i, unsigned long tab[64])
+uint32_t r2(uint32_t abcd[4], union u_word word[16], int s, int i, unsigned long tab[64])
 {
-  a = (b + left_rot(a + func_g(b, c, d) + x + tab[i - 1], s));
-  return (a);
+	abcd[0] = (abcd[1] + left_rot((abcd[0] + func_g(abcd[1], abcd[2], abcd[3]) + word[(5 * (i - 16) + 1) % 16].x + tab[i]), s));
+	return (abcd[0]);
 }
 
-uint32_t r3(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, int s, int i, unsigned long tab[64])
+uint32_t r3(uint32_t abcd[4], union u_word word[16], int s, int i, unsigned long tab[64])
 {
-  a = (b + left_rot(a + func_h(b, c, d) + x + tab[i - 1], s));
-  return (a);
+	abcd[0] = (abcd[1] + left_rot((abcd[0] + func_h(abcd[1], abcd[2], abcd[3]) + word[(3 * (i - 32) + 5) % 16].x + tab[i]), s));
+	return (abcd[0]);
 }
 
-uint32_t r4(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, int s, int i, unsigned long tab[64])
+uint32_t r4(uint32_t abcd[4], union u_word word[16], int s, int i, unsigned long tab[64])
 {
-  a = (b + left_rot((a + func_i(b, c, d) + x + tab[i - 1]), s));
-  return (a);
+	abcd[0] = (abcd[1] + left_rot((abcd[0] + func_i(abcd[1], abcd[2], abcd[3]) + word[(7 * (i - 48)) % 16].x + tab[i]), s));
+	return (abcd[0]);
 }
 
-uint32_t ft_md5(union u_word *string)
+uint32_t ft_md5(union u_word word[16])
 {
-  uint32_t a = A;
-  uint32_t b = B;
-  uint32_t c = C;
-  uint32_t d = D;
-  //int i = 0;
-  int j = 0;
-  int l = 0;
-  uint32_t tmp_a = 0;
-  uint32_t tmp_b = 0;
-  uint32_t tmp_c = 0;
-  uint32_t tmp_d = 0;
-  uint32_t x[16] = {128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //''
-  //uint32_t x[16] = {1819043144, 1867980911, 1063545970, 1819043144, 1867980911, 744778866,
-  //  1699233568, 544173164, 1819438935, 1059073124, 1819043144, 1867980911, 744778866, 8404768, 432, 0};// "Hello World?Hello World, ?Hello World, ?Hello World, ?"
-  //int s1[4] = {7, 12, 17, 22};
-  //int s2[4] = {5, 9, 14, 20};
-  //int s3[4] = {4, 11, 16, 23};
-  //int s4[4] = {6, 10, 15, 21};
-  (void)string;
-  unsigned long tab[64];
-  while (l < 64)
-  {
-    tab[l] = (unsigned long)(fabs(sin(l + 1)) * pow(2, 32));
-    l++;
-  }
-  //while (i < 512)
-  //{
-      tmp_a = a;
-      tmp_b = b;
-      tmp_c = c;
-      tmp_d = d;
-      j = 0;
-      //while(j < 16)
-      //{
-        //printf("j: %d\n", j);
-        //printf("i mod 32 %d\n", i % 32);
-        //x[j][i % 32] = string[i * 16 + j];
-        //x[j][i % 32] = 0;
-        //j++;
-      //}
-      //i++;
-  //}
-  a = r1(a, b, c, d, x[0], 7, 1, tab);
-  d = r1(d, a, b, c, x[1], 12, 2, tab);
-  c = r1(c, d, a, b, x[2], 17, 3, tab);
-  b = r1(b, c, d, a, x[3], 22, 4, tab);
-  a = r1(a, b, c, d, x[4], 7, 5, tab);
-  d = r1(d, a, b, c, x[5], 12, 6, tab);
-  c = r1(c, d, a, b, x[6], 17, 7, tab);
-  b = r1(b, c, d, a, x[7], 22, 8, tab);
-  a = r1(a, b, c, d, x[8], 7, 9, tab);
-  d = r1(d, a, b, c, x[9], 12, 10, tab);
-  c = r1(c, d, a, b, x[10], 17, 11, tab);
-  b = r1(b, c, d, a, x[11], 22, 12, tab);
-  a = r1(a, b, c, d, x[12], 7, 13, tab);
-  d = r1(d, a, b, c, x[13], 12, 14, tab);
-  c = r1(c, d, a, b, x[14], 17, 15, tab);
-  b = r1(b, c, d, a, x[15], 22, 16, tab);
-
-  a = r2(a, b, c, d, x[1], 5, 17, tab);
-  d = r2(d, a, b, c, x[6], 9, 18, tab);
-  c = r2(c, d, a, b, x[11], 14, 19, tab);
-  b = r2(b, c, d, a, x[0], 20, 20, tab);
-  a = r2(a, b, c, d, x[5], 5, 21, tab);
-  d = r2(d, a, b, c, x[10], 9, 22, tab);
-  c = r2(c, d, a, b, x[15], 14, 23, tab);
-  b = r2(b, c, d, a, x[4], 20, 24, tab);
-  a = r2(a, b, c, d, x[9], 5, 25, tab);
-  d = r2(d, a, b, c, x[14], 9, 26, tab);
-  c = r2(c, d, a, b, x[3], 14, 27, tab);
-  b = r2(b, c, d, a, x[8], 20, 28, tab);
-  a = r2(a, b, c, d, x[13], 5, 29, tab);
-  d = r2(d, a, b, c, x[2], 9, 30, tab);
-  c = r2(c, d, a, b, x[7], 14, 31, tab);
-  b = r2(b, c, d, a, x[12], 20, 32, tab);
-
-  a = r3(a, b, c, d, x[5], 4, 33, tab);
-  d = r3(d, a, b, c, x[8], 11, 34, tab);
-  c = r3(c, d, a, b, x[11], 16, 35, tab);
-  b = r3(b, c, d, a, x[14], 23, 36, tab);
-  a = r3(a, b, c, d, x[1], 4, 37, tab);
-  d = r3(d, a, b, c, x[4], 11, 38, tab);
-  c = r3(c, d, a, b, x[7], 16, 39, tab);
-  b = r3(b, c, d, a, x[10], 23, 40, tab);
-  a = r3(a, b, c, d, x[13], 4, 41, tab);
-  d = r3(d, a, b, c, x[0], 11, 42, tab);
-  c = r3(c, d, a, b, x[3], 16, 43, tab);
-  b = r3(b, c, d, a, x[6], 23, 44, tab);
-  a = r3(a, b, c, d, x[9], 4, 45, tab);
-  d = r3(d, a, b, c, x[12], 11, 46, tab);
-  c = r3(c, d, a, b, x[15], 16, 47, tab);
-  b = r3(b, c, d, a, x[2], 23, 48, tab);
-
-  a = r4(a, b, c, d, x[0], 6, 49, tab);
-  d = r4(d, a, b, c, x[7], 10, 50, tab);
-  c = r4(c, d, a, b, x[14], 15, 51, tab);
-  b = r4(b, c, d, a, x[5], 21, 52, tab);
-  a = r4(a, b, c, d, x[12], 6, 53, tab);
-  d = r4(d, a, b, c, x[3], 10, 54, tab);
-  c = r4(c, d, a, b, x[10], 15, 55, tab);
-  b = r4(b, c, d, a, x[1], 21, 56, tab);
-  a = r4(a, b, c, d, x[8], 6, 57, tab);
-  d = r4(d, a, b, c, x[15], 10, 58, tab);
-  c = r4(c, d, a, b, x[6], 15, 59, tab);
-  b = r4(b, c, d, a, x[13], 21, 60, tab);
-  a = r4(a, b, c, d, x[4], 6, 61, tab);
-  d = r4(d, a, b, c, x[11], 10, 62, tab);
-  c = r4(c, d, a, b, x[2], 15, 63, tab);
-  b = r4(b, c, d, a, x[9], 21, 64, tab);
-
-a = rev_int_byte(a + tmp_a);
-b = rev_int_byte(b + tmp_b);
-c = rev_int_byte(c + tmp_c);
-d = rev_int_byte(d + tmp_d);
-printf("%x%x%x%x\n", a, b, c, d);
-// for result convert a, b, c, d to little endian and add them as a string
-return (0);
+	uint32_t abcd[4] = {A, B, C, D};
+	int i = 0;
+	uint32_t tmp_abcd[4] = {A, B, C, D};
+	int s1[4] = {7, 12, 17, 22};
+	int s2[4] = {5, 9, 14, 20};
+	int s3[4] = {4, 11, 16, 23};
+	int s4[4] = {6, 10, 15, 21};
+	uint32_t tmp;
+	unsigned long tab[64];
+	while (i < 64)
+	{
+		tab[i] = (unsigned long)(fabs(sin(i + 1)) * pow(2, 32));
+		i++;
+	}
+	i = 0;
+	while (i < 64)
+	{
+		if (i < 16)
+			tmp = r1(abcd, word, s1[i % 4], i, tab);
+		if (i < 32)
+			tmp = r2(abcd, word, s2[i % 4], i, tab);
+		if (i < 48)
+			tmp = r3(abcd, word, s3[i % 4], i, tab);
+		if (i < 64)
+			tmp = r4(abcd, word, s4[i % 4], i, tab);
+		abcd[0] = abcd[3];
+		abcd[3] = abcd[2];
+		abcd[2] = abcd[1];
+		abcd[1] = tmp;
+		i++;
+	}
+	i = 0;
+	while(i < 4)
+	{
+		abcd[i] = rev_int_byte(abcd[i] + tmp_abcd[i]);
+		i++;
+	}
+	printf("%x%x%x%x\n", abcd[0], abcd[1], abcd[2], abcd[3]);
+	return (0);
 }
 
 int main(int argc, char **argv)
 {
-  union u_word *result;
+	union u_word *result;
 
-  if (argc < 2)
-  {
-      write(2, "usage\n", 6);
-      return (0);
-  }
-  else
-  {
-      //printf("%s\n", argv[1]);
-      result = padding(argv[1]);
-      //printf("%s\n", argv[1]);
-      ft_md5(result);
-      //printf("%s\n", result);
-  }
-  return (0);
+	if (argc < 2)
+	{
+		write(2, "usage\n", 6);
+		return (0);
+	}
+	else
+	{
+		//printf("%s\n", argv[1]);
+		result = padding(argv[1]);
+		//printf("%s\n", argv[1]);
+		ft_md5(result);
+		//printf("%s\n", result);
+	}
+	return (0);
 }
