@@ -83,7 +83,6 @@ uint32_t ft_md5(union u_word word[16])
 	i = 0;
 	while (i < 64)
 	{
-		printf("%u %u %u %u\n", abcd[0], abcd[1], abcd[2], abcd[3]);
 		if (i < 16)
 			tmp = r1(abcd, word, s1[i % 4], i, tab);
 		else if (i < 32)
