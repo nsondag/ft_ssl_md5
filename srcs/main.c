@@ -73,7 +73,7 @@ uint32_t ft_md5(union u_word word[16])
 	int s2[4] = {5, 9, 14, 20};
 	int s3[4] = {4, 11, 16, 23};
 	int s4[4] = {6, 10, 15, 21};
-	uint32_t tmp;
+	uint32_t tmp = 0;
 	unsigned long tab[64];
 	while (i < 64)
 	{
@@ -83,13 +83,14 @@ uint32_t ft_md5(union u_word word[16])
 	i = 0;
 	while (i < 64)
 	{
+		printf("%u %u %u %u\n", abcd[0], abcd[1], abcd[2], abcd[3]);
 		if (i < 16)
 			tmp = r1(abcd, word, s1[i % 4], i, tab);
-		if (i < 32)
+		else if (i < 32)
 			tmp = r2(abcd, word, s2[i % 4], i, tab);
-		if (i < 48)
+		else if (i < 48)
 			tmp = r3(abcd, word, s3[i % 4], i, tab);
-		if (i < 64)
+		else
 			tmp = r4(abcd, word, s4[i % 4], i, tab);
 		abcd[0] = abcd[3];
 		abcd[3] = abcd[2];
