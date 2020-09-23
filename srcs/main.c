@@ -25,18 +25,19 @@ uint32_t			rev_int_byte(uint32_t nbr)
 			(nbr & 0xff00) << 8 | (nbr & 0xff000000) >> 24);
 }
 
-union u_word *padding(char *message)
+union u_word *padding(union u_word *block, int len)
 {
 	union u_word *word;
-	int len;
+	int bit_len;
 
 	if (!(word = malloc(16 * sizeof(*word))))
 		return (NULL);
 	ft_bzero(word, 64);
-	len = ft_strlen(message) * 8;
-	ft_memcpy(word, message, len / 8);
-	word[len / 32].tab[(len / 8) % 4] = 128;
-	ft_memcpy(word + 14, &len, 4);
+	bit_len = len * 8;
+	len = len % 64;
+	ft_memcpy(word, block, len);
+	word[len / 4].tab[len % 4] = 128;
+	ft_memcpy(word + 14, &bit_len, 4);
 	return (word);
 }
 
@@ -66,7 +67,9 @@ uint32_t r4(uint32_t abcd[4], union u_word word[16], int s, int i, unsigned long
 
 uint32_t ft_md5(union u_word word[16])
 {
-	uint32_t abcd[4] = {A, B, C, D};
+	static int tour = 0;
+	static uint32_t abcd[4] = {A, B, C, D};
+	uint32_t result[4] = {0, 0, 0, 0};
 	int i = 0;
 	uint32_t tmp_abcd[4] = {A, B, C, D};
 	int s1[4] = {7, 12, 17, 22};
@@ -75,9 +78,22 @@ uint32_t ft_md5(union u_word word[16])
 	int s4[4] = {6, 10, 15, 21};
 	uint32_t tmp = 0;
 	unsigned long tab[64];
+
+	tmp_abcd[0] = abcd[0];
+	tmp_abcd[1] = abcd[1];
+	tmp_abcd[2] = abcd[2];
+	tmp_abcd[3] = abcd[3];
 	while (i < 64)
 	{
 		tab[i] = (unsigned long)(fabs(sin(i + 1)) * pow(2, 32));
+		i++;
+	}
+	i = 0;
+	//if (tour == 0)
+	//	word[8].x = 1650614882; // "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+	while (i < 16)
+	{
+		printf("i %d %u %c%c%c%c\n", i, word[i].x, word[i].tab[0],  word[i].tab[1],  word[i].tab[2],  word[i].tab[3]);
 		i++;
 	}
 	i = 0;
@@ -100,16 +116,29 @@ uint32_t ft_md5(union u_word word[16])
 	i = 0;
 	while(i < 4)
 	{
-		abcd[i] = rev_int_byte(abcd[i] + tmp_abcd[i]);
+		abcd[i] = abcd[i] + tmp_abcd[i];
 		i++;
 	}
-	printf("%x%x%x%x\n", abcd[0], abcd[1], abcd[2], abcd[3]);
+	i = 0;
+	while(i < 4)
+	{
+		result[i] = rev_int_byte(abcd[i]);
+		i++;
+	}
+	printf("%x%x%x%x\n", result[0], result[1], result[2], result[3]);
+	tour++;
 	return (0);
 }
 
 int main(int argc, char **argv)
 {
 	union u_word *result;
+	union u_word **block;
+	int i;
+	int j;
+	int len;
+	int nb_blocks;
+
 
 	if (argc < 2)
 	{
@@ -118,11 +147,29 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		//printf("%s\n", argv[1]);
-		result = padding(argv[1]);
-		//printf("%s\n", argv[1]);
-		ft_md5(result);
-		//printf("%s\n", result);
+		nb_blocks = ft_strlen(argv[1]) / 64 + 1;
+		if (!(block = malloc(nb_blocks * sizeof(*block))))
+			return (0);
+		j = 0;
+		while (j < nb_blocks)
+		{
+			if (!(block[j++] = malloc(64 * sizeof(**block))))
+				return (0);
+		}
+		j = 0;
+		i = 0;
+		len = ft_strlen(argv[1]);
+		while (i < len - 64)
+		{
+			ft_memcpy(block[j], argv[1] + i + 1, 64);
+			i += 64;
+			j += 1;
+		}
+		ft_memcpy(block[j], argv[1] + i, len % 64);
+		block[j] = padding(block[j], len);
+		j = 0;
+		while (block[j])
+			ft_md5(block[j++]);
 	}
 	return (0);
 }
