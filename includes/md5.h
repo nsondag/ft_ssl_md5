@@ -30,6 +30,16 @@ union	u_word
 	uint32_t         x;
 }		word;
 
+typedef struct s_md5
+{
+	int nb_blocks;
+	unsigned long tab[64];
+	int s1[4];
+	int s2[4];
+	int s3[4];
+	int s4[4];
+}	t_md5;
+
 uint32_t left_rot(uint32_t a, int s);
 uint32_t func_f(uint32_t x, uint32_t y, uint32_t z);
 uint32_t func_g(uint32_t x, uint32_t y, uint32_t z);

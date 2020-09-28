@@ -43,31 +43,43 @@ union u_word *padding(union u_word *block, int len)
 
 uint32_t r1(uint32_t abcd[4], union u_word word[16], int s, int i, unsigned long tab[64])
 {
-	abcd[0] = (abcd[1] + left_rot((abcd[0] + func_f(abcd[1], abcd[2], abcd[3]) + word[i % 16].x + tab[i]), s));
+	int index;
+
+	index = i % 16;
+	abcd[0] = abcd[1] + left_rot((abcd[0] + func_f(abcd[1], abcd[2], abcd[3]) + word[index].x + tab[i]), s);
 	return (abcd[0]);
 }
 
 uint32_t r2(uint32_t abcd[4], union u_word word[16], int s, int i, unsigned long tab[64])
 {
-	abcd[0] = (abcd[1] + left_rot((abcd[0] + func_g(abcd[1], abcd[2], abcd[3]) + word[(5 * (i - 16) + 1) % 16].x + tab[i]), s));
+	int index;
+
+	index = (5 * (i - 16) + 1) % 16;
+	abcd[0] = abcd[1] + left_rot((abcd[0] + func_g(abcd[1], abcd[2], abcd[3]) + word[index].x + tab[i]), s);
 	return (abcd[0]);
 }
 
 uint32_t r3(uint32_t abcd[4], union u_word word[16], int s, int i, unsigned long tab[64])
 {
-	abcd[0] = (abcd[1] + left_rot((abcd[0] + func_h(abcd[1], abcd[2], abcd[3]) + word[(3 * (i - 32) + 5) % 16].x + tab[i]), s));
+	int index;
+
+	index = (3 * (i - 32) + 5) % 16;
+	abcd[0] = abcd[1] + left_rot((abcd[0] + func_h(abcd[1], abcd[2], abcd[3]) + word[index].x + tab[i]), s);
 	return (abcd[0]);
 }
 
 uint32_t r4(uint32_t abcd[4], union u_word word[16], int s, int i, unsigned long tab[64])
 {
-	abcd[0] = (abcd[1] + left_rot((abcd[0] + func_i(abcd[1], abcd[2], abcd[3]) + word[(7 * (i - 48)) % 16].x + tab[i]), s));
+	int index;
+
+	index = (7 * (i - 48)) % 16;
+	abcd[0] = abcd[1] + left_rot((abcd[0] + func_i(abcd[1], abcd[2], abcd[3]) + word[index ].x + tab[i]), s);
 	return (abcd[0]);
 }
 
 uint32_t ft_md5(union u_word word[16])
 {
-	static int tour = 0;
+
 	static uint32_t abcd[4] = {A, B, C, D};
 	uint32_t result[4] = {0, 0, 0, 0};
 	int i = 0;
@@ -86,14 +98,6 @@ uint32_t ft_md5(union u_word word[16])
 	while (i < 64)
 	{
 		tab[i] = (unsigned long)(fabs(sin(i + 1)) * pow(2, 32));
-		i++;
-	}
-	i = 0;
-	//if (tour == 0)
-	//	word[8].x = 1650614882; // "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-	while (i < 16)
-	{
-		printf("i %d %u %c%c%c%c\n", i, word[i].x, word[i].tab[0],  word[i].tab[1],  word[i].tab[2],  word[i].tab[3]);
 		i++;
 	}
 	i = 0;
@@ -126,7 +130,6 @@ uint32_t ft_md5(union u_word word[16])
 		i++;
 	}
 	printf("%x%x%x%x\n", result[0], result[1], result[2], result[3]);
-	tour++;
 	return (0);
 }
 
@@ -161,14 +164,14 @@ int main(int argc, char **argv)
 		len = ft_strlen(argv[1]);
 		while (i < len - 64)
 		{
-			ft_memcpy(block[j], argv[1] + i + 1, 64);
+			ft_memcpy(block[j], argv[1] + i, 64);
 			i += 64;
 			j += 1;
 		}
 		ft_memcpy(block[j], argv[1] + i, len % 64);
 		block[j] = padding(block[j], len);
 		j = 0;
-		while (block[j])
+		while (j < nb_blocks)
 			ft_md5(block[j++]);
 	}
 	return (0);
