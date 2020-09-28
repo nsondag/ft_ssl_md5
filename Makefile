@@ -19,7 +19,7 @@ INCLS = includes/
 LIB = libft/
 HEADERS = md5.h
 H = $(addprefix $(INCLS), $(HEADERS))
-FILES = main.c functions.c
+FILES = main.c functions.c parser.c
 OBJS := $(addprefix $(SRCS), $(FILES:%.c=%.o))
 
 .PHONY: all clean fclean re
