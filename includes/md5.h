@@ -24,6 +24,11 @@
 # define B 0xefcdab89
 # define C 0x98badcfe
 # define D 0x10325476
+# define FLAGS "pqrs"
+# define P 1
+# define Q 2
+# define R 4
+# define S 8
 
 union	u_word
 {
@@ -46,4 +51,7 @@ uint32_t func_g(uint32_t x, uint32_t y, uint32_t z);
 uint32_t func_h(uint32_t x, uint32_t y, uint32_t z);
 uint32_t func_i(uint32_t x, uint32_t y, uint32_t z);
 int 		 parser(char *string, char *file, t_md5 *vars);
+int		show_commands(void);
+int is_command(char *command);
+int is_valid_flag(char *command, char *argv, int *flags);
 #endif
