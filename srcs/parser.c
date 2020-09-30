@@ -64,14 +64,22 @@ int			read_all(char **str, int fd)
 	return (index);
 }
 
-int parser(char *string, char *file, t_md5 *vars)
+int parser(char *string, char *file, t_md5 *vars, t_all *all)
 {
   int fd;
 
-  if ((fd = open(file, O_RDONLY)) == -1)
-    read_all(&string, 0);
+	if (all->flags & P)
+	{
+		read_all(&string, 0);
+		all->flags -= P;
+	}
+  else if ((fd = open(file, O_RDONLY)) == -1)
+	{
+		printf("md5: %s: No such file or directory\n", file);
+		return (0);
+	}
   else
     read_all(&string, fd);
   vars->message = string;
-  return (0);
+  return (1);
 }

@@ -128,7 +128,7 @@ void init_s(t_md5 *vars)
 	vars->s[3][3] = 21;
 }
 
-uint32_t ft_md5(union u_word word[16], t_md5 *vars)
+uint32_t *ft_md5(union u_word word[16], t_md5 *vars)
 {
 	static uint32_t abcd[4] = {A, B, C, D};
 	uint32_t result[4] = {0, 0, 0, 0};
@@ -178,10 +178,10 @@ uint32_t ft_md5(union u_word word[16], t_md5 *vars)
 		i++;
 	}
 	//printf("%x%x%x%x\n", result[0], result[1], result[2], result[3]);
-	return (0);
+	return (&result[0]);
 }
 
-int process (int argc, char **argv, int flags)
+int process (char *av, int *flags, t_all *all)
 {
 	t_md5 vars;
 	union u_word *result;
@@ -191,13 +191,21 @@ int process (int argc, char **argv, int flags)
 	int len;
 	char *string;
 	int	check;
+	uint32_t *res;
 
 	check = 0;
 	string = NULL;
-	if (argc < 2)
-		parser(string, argv[1], &vars);
+	if (*flags & S && all->listen_flag)
+	{
+		*flags -= S;
+		vars.message = av;
+	}
 	else
-		vars.message = argv[1];
+	{
+		if (!parser(vars.message, av, &vars, all))
+			return (0);
+		all->listen_flag = 0;
+	}
 	init_s(&vars);
 	init_tab(&vars);
 	vars.nb_blocks = ft_strlen(vars.message) / 56 + 1; // wrong !!!!???
@@ -236,26 +244,29 @@ int process (int argc, char **argv, int flags)
 	//printf("after padding\n");
 	j = 0;
 	while (j < vars.nb_blocks)
-		ft_md5(block[j++], &vars);
+		res = ft_md5(block[j++], &vars);
+	printf("%x%x%x%x\n", res[0], res[1], res[2], res[3]);
 	return (0);
 }
 
-int dispatch(int argc, char **argv, char *command, int flags)
+int dispatch(t_all *all)
 {
-	if (ft_strequ(command, "md5"))
+	if (ft_strequ(all->command, "md5"))
 	{
-		printf("WIP!!!\n");
-		process(argc, argv, flags);
+		printf("flag: %d | MD5(\"%s\") = ", all->flags, all->av);
+		process(all->av, &all->flags, all);
 	}
-	else if (ft_strequ(command, "sha256"))
+	else if (ft_strequ(all->command, "sha256"))
 		printf("COMMING SOON!!!\n");
+	free(all->av);
+	all->av = NULL;
 	return (0);
 }
 
 int main(int argc, char **argv)
 {
 	int i;
-	int flags;
+	t_all all;
 
 	if (argc < 2)
 	{
@@ -268,13 +279,24 @@ int main(int argc, char **argv)
 		show_commands();
 		return (1);
 	}
+	all.flags = 0;
+	all.av = NULL;
+	all.listen_flag = 1;
+	ft_memcpy(all.command, argv[1], ft_strlen(argv[1]));
 	i = 2;
 	while (i < argc)
 	{
-		if (*argv[i] == '-')
-			is_valid_flag(argv[1], &argv[i][1], &flags);
-		i++;
+		if (all.av)
+			dispatch(&all);
+		else if (*argv[i] == '-' && !(all.flags & S) && all.listen_flag)
+			is_valid_flag(&all, &argv[i++][1]);
+		else
+		{
+			if (!(all.av = malloc(ft_strlen(argv[i]) * sizeof(all.av))))
+				return (1);
+			ft_strcpy(all.av, argv[i++]);
+			dispatch(&all);
+		}
 	}
-	dispatch(argc, argv, argv[1], flags);
 	return (0);
 }

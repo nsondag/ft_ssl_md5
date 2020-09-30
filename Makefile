@@ -13,7 +13,7 @@
 NAME = ft_ssl
 
 CC = gcc
-FLAGS = -Wall -Wextra -Werror -O3
+FLAGS = -O3
 SRCS = srcs/
 INCLS = includes/
 LIB = libft/

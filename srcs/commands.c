@@ -50,18 +50,27 @@ int		is_command(char *command)
 	return (0);
 }
 
-int		is_valid_flag(char *command, char *argv, int *flags)
+int		is_valid_flag(t_all *all, char *av)
 {
 	int i;
 
 	i = 0;
-	while (argv[i])
+	while (av[i])
 	{
-		if (ft_strchr(FLAGS, argv[i]))
-			*flags += pow(2, argv[i++] - 'p');
+		if (ft_strchr(FLAGS, av[i]))
+		{
+			all->flags += pow(2, av[i++] - 'p');
+			if (all->flags & S && av[i])
+			{
+				if (!(all->av = malloc((ft_strlen(av) - 1)* sizeof(*all->av))))
+					return (1);
+				ft_memcpy(all->av, &av[1], ft_strlen(av) - 1);
+				return (0);
+			}
+		}
 		else
 		{
-			printf("%s: illegal option -- %c\n", command, argv[i]);
+			printf("%s: illegal option -- %c\n", all->command, av[i]);
 			return (1);
 		}
 	}

@@ -45,13 +45,21 @@ typedef struct s_md5
 	char *message;
 }	t_md5;
 
+typedef struct s_all
+{
+	char	*av;
+	int		flags;
+	char	command[256];
+	int		listen_flag;
+}	t_all;
+
 uint32_t left_rot(uint32_t a, int s);
 uint32_t func_f(uint32_t x, uint32_t y, uint32_t z);
 uint32_t func_g(uint32_t x, uint32_t y, uint32_t z);
 uint32_t func_h(uint32_t x, uint32_t y, uint32_t z);
 uint32_t func_i(uint32_t x, uint32_t y, uint32_t z);
-int 		 parser(char *string, char *file, t_md5 *vars);
+int 		 parser(char *string, char *file, t_md5 *vars, t_all *all);
 int		show_commands(void);
 int is_command(char *command);
-int is_valid_flag(char *command, char *argv, int *flags);
+int is_valid_flag(t_all *all, char *av);
 #endif
