@@ -51,6 +51,8 @@ typedef struct s_all
 	int		flags;
 	char	command[256];
 	int		listen_flag;
+	int   read_entry;
+	int		ac;
 }	t_all;
 
 uint32_t left_rot(uint32_t a, int s);

@@ -181,7 +181,7 @@ uint32_t *ft_md5(union u_word word[16], t_md5 *vars)
 	return (&result[0]);
 }
 
-int process (char *av, int *flags, t_all *all)
+int process (char *av, t_all *all)
 {
 	t_md5 vars;
 	union u_word *result;
@@ -195,17 +195,17 @@ int process (char *av, int *flags, t_all *all)
 
 	check = 0;
 	string = NULL;
-	if (*flags & S && all->listen_flag)
+	if (all->flags & S && all->listen_flag)
 	{
-		*flags -= S;
+		all->flags &= ~S;
 		vars.message = av;
 	}
 	else
 	{
 		if (!parser(vars.message, av, &vars, all))
 			return (0);
-		all->listen_flag = 0;
 	}
+	printf("flag: %d | MD5(\"%s\") = ", all->flags, vars.message);
 	init_s(&vars);
 	init_tab(&vars);
 	vars.nb_blocks = ft_strlen(vars.message) / 56 + 1; // wrong !!!!???
@@ -254,7 +254,7 @@ int dispatch(t_all *all)
 	if (ft_strequ(all->command, "md5"))
 	{
 		printf("flag: %d | MD5(\"%s\") = ", all->flags, all->av);
-		process(all->av, &all->flags, all);
+		process(all->av, all);
 	}
 	else if (ft_strequ(all->command, "sha256"))
 		printf("COMMING SOON!!!\n");
@@ -282,11 +282,13 @@ int main(int argc, char **argv)
 	all.flags = 0;
 	all.av = NULL;
 	all.listen_flag = 1;
+	all.ac = 0;
+	all.read_entry = 1;
 	ft_memcpy(all.command, argv[1], ft_strlen(argv[1]));
 	i = 2;
 	while (i < argc)
 	{
-		if (all.av)
+		if (all.av || (all.flags & P))
 			dispatch(&all);
 		else if (*argv[i] == '-' && !(all.flags & S) && all.listen_flag)
 			is_valid_flag(&all, &argv[i++][1]);
@@ -295,8 +297,11 @@ int main(int argc, char **argv)
 			if (!(all.av = malloc(ft_strlen(argv[i]) * sizeof(all.av))))
 				return (1);
 			ft_strcpy(all.av, argv[i++]);
+			all.ac++;
 			dispatch(&all);
 		}
 	}
+	if (!all.ac || all.flags & P)
+		dispatch(&all);
 	return (0);
 }

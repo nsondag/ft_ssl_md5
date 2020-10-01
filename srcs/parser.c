@@ -71,15 +71,32 @@ int parser(char *string, char *file, t_md5 *vars, t_all *all)
 	if (all->flags & P)
 	{
 		read_all(&string, 0);
-		all->flags -= P;
+		close(0);
+		all->flags &= ~P;
+		all->read_entry = 0;
 	}
-  else if ((fd = open(file, O_RDONLY)) == -1)
+  else if (file && (fd = open(file, O_RDONLY)) == -1)
 	{
 		printf("md5: %s: No such file or directory\n", file);
+		all->listen_flag = 0;
 		return (0);
 	}
-  else
+  else if (file)
+	{
     read_all(&string, fd);
+		close(fd);
+		all->listen_flag = 0;
+	}
+	else if (all->read_entry)
+	{
+		read_all(&string, 0);
+		close(0);
+		all->read_entry = 0;
+	}
+	else
+	{
+		string = "";
+	}
   vars->message = string;
   return (1);
 }
