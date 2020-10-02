@@ -31,6 +31,7 @@ union u_word *padding(union u_word *block, int len, int check)
 	union u_word *word;
 	int bit_len;
 
+	printf("[rocce]\n");
 	if (!(word = malloc(16 * sizeof(*word))))
 		return (NULL);
 	ft_bzero(word, 64);
@@ -38,8 +39,8 @@ union u_word *padding(union u_word *block, int len, int check)
 	len = len % 64;
 	//printf("len %d\n", len);
 	//printf("%u\n", block->x);
-	ft_memcpy(word, block, len);
-	//printf("test\n");
+	if (block)
+		ft_memcpy(word, block, len);
 	if (check)
 	{
 		//printf("do 1\n");
@@ -199,18 +200,26 @@ int process (char *av, t_all *all)
 	{
 		all->flags &= ~S;
 		vars.message = av;
+		if (!(all->flags & Q) && !(all->flags & R))
+			printf("MD5 (\"%s\") = ", vars.message);
 	}
 	else
 	{
 		if (!parser(vars.message, av, &vars, all))
 			return (0);
+		if (all->flags & R && !(all->flags & Q) && !(all->flags & P))
+			printf(" \"%s\"\n", vars.message);
+		else if (all->flags & P)
+		{
+			all->read_entry = 0;
+			if (all->read_entry)
+				printf("/\n/");
+			all->flags &= ~P;
+		}
 	}
-	printf("flag: %d | MD5(\"%s\") = ", all->flags, vars.message);
 	init_s(&vars);
 	init_tab(&vars);
 	vars.nb_blocks = ft_strlen(vars.message) / 56 + 1; // wrong !!!!???
-	//printf("len_message %zu\n", ft_strlen(vars.message));
-	//printf("nb_blocks %d\n", vars.nb_blocks);
 	if (!(block = malloc(vars.nb_blocks * sizeof(*block))))
 		return (0);
 	j = 0;
@@ -226,36 +235,35 @@ int process (char *av, t_all *all)
 	{
 		ft_memcpy(block[j], vars.message + i, 64);
 		i += 64;
-		//printf("i %d\n", i);
 		if (i % 64 == 0)
 		{
-			//printf("teest\n");
 			if (i != 64)
 		 		block[j] = padding(block[j], len, 1);
 			else
 				check = 2;
-		//	printf("check %d\n", check);
 		}
 		j += 1;
 	}
-	ft_memcpy(block[j], vars.message + i, len / 64);
-	//printf("j %d\n", j);
-	block[j] = padding(block[j], len, check);
-	//printf("after padding\n");
+	if (i > 448)
+	{
+		ft_memcpy(block[j], vars.message + i, len / 64);
+		block[j] = padding(block[j], len, check);
+	}
 	j = 0;
 	while (j < vars.nb_blocks)
 		res = ft_md5(block[j++], &vars);
-	printf("%x%x%x%x\n", res[0], res[1], res[2], res[3]);
+	printf("%x%x%x%x", res[0], res[1], res[2], res[3]);
+	if ((all->flags & R) && !(all->flags & Q) && *vars.message)
+		printf(" \"%s\"\n", vars.message);
+	else
+		printf("\n");
 	return (0);
 }
 
 int dispatch(t_all *all)
 {
 	if (ft_strequ(all->command, "md5"))
-	{
-		printf("flag: %d | MD5(\"%s\") = ", all->flags, all->av);
 		process(all->av, all);
-	}
 	else if (ft_strequ(all->command, "sha256"))
 		printf("COMMING SOON!!!\n");
 	free(all->av);
