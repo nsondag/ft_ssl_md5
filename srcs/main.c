@@ -31,7 +31,7 @@ union u_word *padding(union u_word *block, int len, int check)
 	union u_word *word;
 	int bit_len;
 
-	printf("[rocce]\n");
+	//printf("padding check %d\n", check);
 	if (!(word = malloc(16 * sizeof(*word))))
 		return (NULL);
 	ft_bzero(word, 64);
@@ -39,8 +39,7 @@ union u_word *padding(union u_word *block, int len, int check)
 	len = len % 64;
 	//printf("len %d\n", len);
 	//printf("%u\n", block->x);
-	if (block)
-		ft_memcpy(word, block, len);
+	ft_memcpy(word, block, len);
 	if (check)
 	{
 		//printf("do 1\n");
@@ -141,11 +140,11 @@ uint32_t *ft_md5(union u_word word[16], t_md5 *vars)
 	i = 0;
 	while (i < 16)
 	{
-		//printf("word: %u", word[i].x);
-		//printf(" %c", word[i].tab[0]);
-		//printf(" %c", word[i].tab[1]);
-		//printf(" %c", word[i].tab[2]);
-		//printf(" %c\n", word[i].tab[3]);
+		printf("word: %u", word[i].x);
+		printf(" %c", word[i].tab[0]);
+		printf(" %c", word[i].tab[1]);
+		printf(" %c", word[i].tab[2]);
+		printf(" %c\n", word[i].tab[3]);
 		i++;
 	}
 	i = 0;
@@ -231,7 +230,7 @@ int process (char *av, t_all *all)
 	i = 0;
 	j = 0;
 	len = ft_strlen(vars.message);
-	while (i < len - 8)
+	while (i < len - 8 && len > 56)
 	{
 		ft_memcpy(block[j], vars.message + i, 64);
 		i += 64;
@@ -244,15 +243,18 @@ int process (char *av, t_all *all)
 		}
 		j += 1;
 	}
-	if (i > 448)
+	if (len < 56)
 	{
-		ft_memcpy(block[j], vars.message + i, len / 64);
-		block[j] = padding(block[j], len, check);
+		ft_memcpy(block[j], vars.message + i, len);
+		check = 2;
 	}
+	else
+		ft_memcpy(block[j], vars.message + i, len / 64);
+	block[j] = padding(block[j], len, check);
 	j = 0;
 	while (j < vars.nb_blocks)
 		res = ft_md5(block[j++], &vars);
-	printf("%x%x%x%x", res[0], res[1], res[2], res[3]);
+	printf("%08x%08x%08x%08x", res[0], res[1], res[2], res[3]);
 	if ((all->flags & R) && !(all->flags & Q) && *vars.message)
 		printf(" \"%s\"\n", vars.message);
 	else
