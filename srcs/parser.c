@@ -67,7 +67,9 @@ int			read_all(char **str, int fd)
 int parser(char *string, char *file, t_md5 *vars, t_all *all)
 {
   int fd;
+	int len;
 
+	len = 0;
 	if (all->flags & P)
 	{
 		read_all(&string, 0);
@@ -83,7 +85,7 @@ int parser(char *string, char *file, t_md5 *vars, t_all *all)
 	}
   else if (file)
 	{
-    read_all(&string, fd);
+    len = read_all(&string, fd);
 		close(fd);
 		if (!(all->flags & Q) && !(all->flags & R))
 			printf("MD5 (%s) = ", file);
@@ -97,5 +99,5 @@ int parser(char *string, char *file, t_md5 *vars, t_all *all)
 	else
 		string = "";
   vars->message = string;
-  return (1);
+  return (len);
 }

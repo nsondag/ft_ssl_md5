@@ -127,7 +127,7 @@ uint32_t *ft_md5(union u_word word[16], t_md5 *vars)
 	i = 0;
 	while (i < 16)
 	{
-		//printf("word: %u", word[i].x);
+		//printf("word: %08x", word[i].x);
 		//printf(" %c", word[i].tab[0]);
 		//printf(" %c", word[i].tab[1]);
 		//printf(" %c", word[i].tab[2]);
@@ -180,6 +180,7 @@ int process (char *av, t_all *all)
 	uint32_t *res;
 
 	string = NULL;
+	len = 0;
 	if (all->flags & S && all->listen_flag)
 	{
 		all->flags &= ~S;
@@ -189,8 +190,9 @@ int process (char *av, t_all *all)
 	}
 	else
 	{
-		if (!parser(vars.message, av, &vars, all))
+		if (!(len = parser(vars.message, av, &vars, all)))
 			return (0);
+		//len++;
 		if (all->flags & R && !(all->flags & Q) && !(all->flags & P))
 			printf(" \"%s\"\n", vars.message);
 		else if (all->flags & P)
@@ -207,9 +209,11 @@ int process (char *av, t_all *all)
 	vars.abcd[1] = B;
 	vars.abcd[2] = C;
 	vars.abcd[3] = D;
-	vars.message[ft_strlen(vars.message)] = (char)128;
-	vars.nb_blocks = ft_strlen(vars.message) / 64 + 1;
-	if (ft_strlen(vars.message) % 64 > 56)
+	if (!len)
+		len = ft_strlen(vars.message);
+	vars.message[len] = (unsigned char)128;
+	vars.nb_blocks = len / 64 + 1;
+	if (len % 64 > 56)
 		vars.nb_blocks++;
 	if (!(block = malloc(vars.nb_blocks * sizeof(*block))))
 		return (0);
@@ -221,7 +225,7 @@ int process (char *av, t_all *all)
 	}
 	i = 0;
 	j = 0;
-	len = ft_strlen(vars.message);
+	len++;
 	while (i < len)
 	{
 		ft_memcpy(block[j], vars.message + i, 64);
