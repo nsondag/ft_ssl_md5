@@ -26,30 +26,18 @@ uint32_t			rev_int_byte(uint32_t nbr)
 			(nbr & 0xff00) << 8 | (nbr & 0xff000000) >> 24);
 }
 
-union u_word *padding(union u_word *block, int len, int check)
+union u_word *padding(union u_word *block, int len)
 {
 	union u_word *word;
 	int bit_len;
 
-	//printf("padding check %d\n", check);
 	if (!(word = malloc(16 * sizeof(*word))))
 		return (NULL);
 	ft_bzero(word, 64);
-	bit_len = len * 8;
+	bit_len = (len - 1) * 8;
 	len = len % 64;
-	//printf("len %d\n", len);
-	//printf("%u\n", block->x);
 	ft_memcpy(word, block, len);
-	if (check)
-	{
-		//printf("do 1\n");
-		word[len / 4].tab[len % 4] = 128;
-	}
-	if (check % 2 == 0)
-	{
-		//printf("do 2\n");
-		ft_memcpy(word + 14, &bit_len, 4);
-	}
+	ft_memcpy(word + 14, &bit_len, 4);
 	return (word);
 }
 
@@ -130,51 +118,50 @@ void init_s(t_md5 *vars)
 
 uint32_t *ft_md5(union u_word word[16], t_md5 *vars)
 {
-	static uint32_t abcd[4] = {A, B, C, D};
 	uint32_t result[4] = {0, 0, 0, 0};
 	uint32_t tmp_abcd[4] = {A, B, C, D};
 	uint32_t tmp;
 	int i;
 
-	ft_memcpy(tmp_abcd, abcd, 16);
+	ft_memcpy(tmp_abcd, vars->abcd, 16);
 	i = 0;
 	while (i < 16)
 	{
-		printf("word: %u", word[i].x);
-		printf(" %c", word[i].tab[0]);
-		printf(" %c", word[i].tab[1]);
-		printf(" %c", word[i].tab[2]);
-		printf(" %c\n", word[i].tab[3]);
+		//printf("word: %u", word[i].x);
+		//printf(" %c", word[i].tab[0]);
+		//printf(" %c", word[i].tab[1]);
+		//printf(" %c", word[i].tab[2]);
+		//printf(" %c\n", word[i].tab[3]);
 		i++;
 	}
 	i = 0;
 	while (i < 64)
 	{
 		if (i < 16)
-			tmp = r1(abcd, word, vars->s[0][i % 4], i, vars->tab);
+			tmp = r1(vars->abcd, word, vars->s[0][i % 4], i, vars->tab);
 		else if (i < 32)
-			tmp = r2(abcd, word, vars->s[1][i % 4], i, vars->tab);
+			tmp = r2(vars->abcd, word, vars->s[1][i % 4], i, vars->tab);
 		else if (i < 48)
-			tmp = r3(abcd, word, vars->s[2][i % 4], i, vars->tab);
+			tmp = r3(vars->abcd, word, vars->s[2][i % 4], i, vars->tab);
 		else
-			tmp = r4(abcd, word, vars->s[3][i % 4], i, vars->tab);
+			tmp = r4(vars->abcd, word, vars->s[3][i % 4], i, vars->tab);
 		//printf("abcd: %u\n", tmp);
-		abcd[0] = abcd[3];
-		abcd[3] = abcd[2];
-		abcd[2] = abcd[1];
-		abcd[1] = tmp;
+		vars->abcd[0] = vars->abcd[3];
+		vars->abcd[3] = vars->abcd[2];
+		vars->abcd[2] = vars->abcd[1];
+		vars->abcd[1] = tmp;
 		i++;
 	}
 	i = 0;
 	while(i < 4)
 	{
-		abcd[i] = abcd[i] + tmp_abcd[i];
+		vars->abcd[i] = vars->abcd[i] + tmp_abcd[i];
 		i++;
 	}
 	i = 0;
 	while(i < 4)
 	{
-		result[i] = rev_int_byte(abcd[i]);
+		result[i] = rev_int_byte(vars->abcd[i]);
 		i++;
 	}
 	//printf("%x%x%x%x\n", result[0], result[1], result[2], result[3]);
@@ -190,10 +177,8 @@ int process (char *av, t_all *all)
 	int j;
 	int len;
 	char *string;
-	int	check;
 	uint32_t *res;
 
-	check = 0;
 	string = NULL;
 	if (all->flags & S && all->listen_flag)
 	{
@@ -212,13 +197,20 @@ int process (char *av, t_all *all)
 		{
 			all->read_entry = 0;
 			if (all->read_entry)
-				printf("/\n/");
+				printf("\n");
 			all->flags &= ~P;
 		}
 	}
 	init_s(&vars);
 	init_tab(&vars);
-	vars.nb_blocks = ft_strlen(vars.message) / 56 + 1; // wrong !!!!???
+	vars.abcd[0] = A;
+	vars.abcd[1] = B;
+	vars.abcd[2] = C;
+	vars.abcd[3] = D;
+	vars.message[ft_strlen(vars.message)] = (char)128;
+	vars.nb_blocks = ft_strlen(vars.message) / 64 + 1;
+	if (ft_strlen(vars.message) % 64 > 56)
+		vars.nb_blocks++;
 	if (!(block = malloc(vars.nb_blocks * sizeof(*block))))
 		return (0);
 	j = 0;
@@ -230,27 +222,15 @@ int process (char *av, t_all *all)
 	i = 0;
 	j = 0;
 	len = ft_strlen(vars.message);
-	while (i < len - 8 && len > 56)
+	while (i < len)
 	{
 		ft_memcpy(block[j], vars.message + i, 64);
 		i += 64;
-		if (i % 64 == 0)
-		{
-			if (i != 64)
-		 		block[j] = padding(block[j], len, 1);
-			else
-				check = 2;
-		}
-		j += 1;
+		j++;
 	}
-	if (len < 56)
-	{
-		ft_memcpy(block[j], vars.message + i, len);
-		check = 2;
-	}
-	else
-		ft_memcpy(block[j], vars.message + i, len / 64);
-	block[j] = padding(block[j], len, check);
+	if (j == vars.nb_blocks)
+		j--;
+	block[j] = padding(block[j], len);
 	j = 0;
 	while (j < vars.nb_blocks)
 		res = ft_md5(block[j++], &vars);
@@ -304,7 +284,7 @@ int main(int argc, char **argv)
 			is_valid_flag(&all, &argv[i++][1]);
 		else
 		{
-			if (!(all.av = malloc(ft_strlen(argv[i]) * sizeof(all.av))))
+			if (!(all.av = malloc((ft_strlen(argv[i]) + 1) * sizeof(all.av))))
 				return (1);
 			ft_strcpy(all.av, argv[i++]);
 			all.ac++;
