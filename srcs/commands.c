@@ -62,7 +62,7 @@ int		is_valid_flag(t_all *all, char *av)
 			all->flags |= (int)pow(2, av[i++] - 'p');
 			if (all->flags & S && av[i])
 			{
-				if (!(all->av = malloc((ft_strlen(av) - 1)* sizeof(*all->av))))
+				if (!(all->av = malloc((ft_strlen(av) - 1) * sizeof(*all->av))))
 					return (1);
 				ft_memcpy(all->av, &av[1], ft_strlen(av) - 1);
 				return (0);

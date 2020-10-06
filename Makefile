@@ -13,13 +13,13 @@
 NAME = ft_ssl
 
 CC = gcc
-FLAGS = -O3
+FLAGS = -Wall -Werror -Wextra -O3
 SRCS = srcs/
 INCLS = includes/
 LIB = libft/
 HEADERS = md5.h
 H = $(addprefix $(INCLS), $(HEADERS))
-FILES = main.c functions.c parser.c commands.c
+FILES = main.c functions.c parser.c commands.c init.c md5.c
 OBJS := $(addprefix $(SRCS), $(FILES:%.c=%.o))
 
 .PHONY: all clean fclean re

@@ -64,7 +64,7 @@ int			read_all(char **str, int fd)
 	return (index);
 }
 
-int parser(char *string, char *file, t_md5 *vars, t_all *all)
+int parser(char *string, char *file, t_all *all)
 {
   int fd;
 	int len;
@@ -98,6 +98,6 @@ int parser(char *string, char *file, t_md5 *vars, t_all *all)
 	}
 	else
 		string = "";
-  vars->message = string;
+  all->message = string;
   return (len);
 }
