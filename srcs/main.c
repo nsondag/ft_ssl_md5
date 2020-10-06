@@ -295,7 +295,9 @@ int main(int argc, char **argv)
 			dispatch(&all);
 		}
 	}
-	if (!all.ac || all.flags & P)
+	if (all.flags & S)
+		printf("md5: option requires an argument -- s\n");
+	else if (!all.ac || all.flags & P)
 		dispatch(&all);
 	return (0);
 }
