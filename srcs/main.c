@@ -62,7 +62,7 @@ int				process(char *av, t_all *all)
 	}
 	else
 	{
-		if (!(len = parser(all->message, av, all)))
+		if ((len = parser(all->message, av, all)) < 0)
 			return (0);
 		if (all->flags & R && !(all->flags & Q) && !(all->flags & P))
 			printf(" \"%s\"\n", all->message);
@@ -82,7 +82,7 @@ int				process(char *av, t_all *all)
 		len = ft_strlen(all->message);
 	all->message[len] = (unsigned char)128;
 	all->nb_blocks = len / 64 + 1;
-	if (len % 64 > 56)
+	if (len % 64 >= 56)
 		all->nb_blocks++;
 	if (!(block = malloc(all->nb_blocks * sizeof(*block))))
 		return (0);

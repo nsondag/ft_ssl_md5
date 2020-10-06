@@ -81,7 +81,7 @@ int parser(char *string, char *file, t_all *all)
 	{
 		printf("md5: %s: No such file or directory\n", file);
 		all->listen_flag = 0;
-		return (0);
+		return (-1);
 	}
   else if (file)
 	{
