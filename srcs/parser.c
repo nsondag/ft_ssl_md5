@@ -67,6 +67,7 @@ int			read_all(char **str, int fd)
 int parser(char *string, char *file, t_all *all)
 {
   int fd;
+	int fd2;
 	int len;
 
 	len = 0;
@@ -86,6 +87,16 @@ int parser(char *string, char *file, t_all *all)
   else if (file)
 	{
     len = read_all(&string, fd);
+		if (!len)
+		{
+			if ((fd2 = open(ft_strcat(file, "/"), O_RDONLY)) != -1)
+			{
+				printf("md5: %s: Is a directory\n", ft_strsub(file, 0, ft_strlen(file) - 1));
+				return (-1);
+			}
+			file = ft_strsub(file, 0, ft_strlen(file) - 1);
+			close(fd2);
+		}
 		close(fd);
 		if (!(all->flags & Q) && !(all->flags & R))
 			printf("MD5 (%s) = ", file);
