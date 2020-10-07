@@ -30,7 +30,7 @@ int		show_commands(void)
 	i = 0;
 	while (*g_md_commands[i])
 		printf("%s\n", g_md_commands[i++]);
-	printf("\nCipher commands\n");
+	printf("\nCipher commands:\n");
 	i = 0;
 	while (*g_cipher_commands[i])
 		printf("%s\n", g_cipher_commands[i++]);
@@ -59,12 +59,13 @@ int		is_valid_flag(t_all *all, char *av)
 	{
 		if (ft_strchr(FLAGS, av[i]))
 		{
-			all->flags |= (int)pow(2, av[i++] - 'p');
+			all->flags |= (int)ft_pow(2, av[i++] - 'p');
 			if (all->flags & S && av[i])
 			{
-				if (!(all->av = malloc((ft_strlen(av) - 1) * sizeof(*all->av))))
+				all->ac++;
+				if (!(all->av = malloc((ft_strlen(av) - i) * sizeof(*all->av))))
 					return (1);
-				ft_memcpy(all->av, &av[1], ft_strlen(av) - 1);
+				ft_memcpy(all->av, &av[i], ft_strlen(av) - i);
 				return (0);
 			}
 		}

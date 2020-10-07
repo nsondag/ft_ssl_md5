@@ -20,6 +20,7 @@
 # include "../libft/libft.h"
 # include <fcntl.h>
 
+# define BUFFER 100000
 # define A 0x67452301
 # define B 0xefcdab89
 # define C 0x98badcfe

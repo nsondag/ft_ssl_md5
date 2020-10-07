@@ -29,16 +29,74 @@ uint32_t		rev_int_byte(uint32_t nbr)
 union u_word	*padding(union u_word *block, int len)
 {
 	union u_word	*word;
-	int				bit_len;
+	uint64_t				bit_len;
+	uint64_t				bit_len2;
 
 	if (!(word = malloc(16 * sizeof(*word))))
 		return (NULL);
 	ft_bzero(word, 64);
-	bit_len = (len - 1) * 8;
+	bit_len = ((uint64_t)len - 1) * 8;
+	bit_len2 = bit_len >> 32;
 	len = len % 64;
 	ft_memcpy(word, block, len);
 	ft_memcpy(word + 14, &bit_len, 4);
+	ft_memcpy(word + 15, &bit_len2, 4);
 	return (word);
+}
+
+void get_blocks(t_all *all, union u_word	**block, int *len)
+{
+
+		int j = 0;
+		int i = 0;
+
+		*len = ft_strlen(all->message);
+		all->message[*len] = (unsigned char)128;
+		all->message[*len + 1] = 0;
+		all->nb_blocks = *len / 64 + 1;
+		if (*len % 64 >= 56)
+			all->nb_blocks++;
+		if (!(block = malloc(all->nb_blocks * sizeof(*block))))
+			return ;
+		j = 0;
+		while (j < all->nb_blocks)
+		{
+			if (!(block[j++] = malloc(64 * sizeof(**block))))
+				return ;
+		}
+		i = 0;
+		j = 0;
+		*len += 1;
+		while (i < *len)
+		{
+			ft_memcpy(block[j], all->message + i, 64);
+			i += 64;
+			j++;
+		}
+		if (j == all->nb_blocks)
+			j--;
+		block[j] = padding(block[j], *len);
+		process_md5_blocks(all, block);
+}
+
+void process_md5(t_all *all, union u_word	**block)
+{
+	int i;
+	uint32_t *res;
+
+	i = 0;
+	all->md5_vars.abcd[0] = A;
+	all->md5_vars.abcd[1] = B;
+	all->md5_vars.abcd[2] = C;
+	all->md5_vars.abcd[3] = D;
+	while (i < all->nb_blocks)
+		res = ft_md5(block[i++], &all->md5_vars);
+	i = -1;
+	while (++i < 4)
+	{
+		res[i] = rev_int_byte(res[i]);
+		printf("%08x", res[i]);
+	}
 }
 
 int				process(char *av, t_all *all)
@@ -47,9 +105,8 @@ int				process(char *av, t_all *all)
 	union u_word	**block;
 	int				i;
 	int				j;
-	int				len;
-	char			*string;
-	uint32_t		*res;
+	int				len;   // length of the message
+	char			*string; //
 
 	string = NULL;
 	len = 0;
@@ -64,9 +121,7 @@ int				process(char *av, t_all *all)
 	{
 		if ((len = parser(all->message, av, all)) < 0)
 			return (0);
-		if (all->flags & R && !(all->flags & Q) && !(all->flags & P))
-			printf(" \"%s\"\n", all->message);
-		else if (all->flags & P)
+		if (all->flags & P)
 		{
 			all->read_entry = 0;
 			if (all->read_entry)
@@ -74,13 +129,10 @@ int				process(char *av, t_all *all)
 			all->flags &= ~P;
 		}
 	}
-	all->md5_vars.abcd[0] = A;
-	all->md5_vars.abcd[1] = B;
-	all->md5_vars.abcd[2] = C;
-	all->md5_vars.abcd[3] = D;
 	if (!len)
 		len = ft_strlen(all->message);
 	all->message[len] = (unsigned char)128;
+	all->message[len + 1] = 0;
 	all->nb_blocks = len / 64 + 1;
 	if (len % 64 >= 56)
 		all->nb_blocks++;
@@ -104,18 +156,10 @@ int				process(char *av, t_all *all)
 	if (j == all->nb_blocks)
 		j--;
 	block[j] = padding(block[j], len);
-	j = 0;
-	while (j < all->nb_blocks)
-	{
-		res = ft_md5(block[j++], &all->md5_vars);
-	}
-	res[0] = rev_int_byte(res[0]);
-	res[1] = rev_int_byte(res[1]);
-	res[2] = rev_int_byte(res[2]);
-	res[3] = rev_int_byte(res[3]);
-	printf("%08x%08x%08x%08x", res[0], res[1], res[2], res[3]);
+	process_md5(all, block);
+	all->message[len - 1] = 0;
 	if ((all->flags & R) && !(all->flags & Q) && *all->message)
-		printf(" \"%s\"\n", all->message);
+			printf(" \"%s\"\n", all->message);
 	else
 		printf("\n");
 	return (0);
@@ -166,10 +210,7 @@ int			main(int argc, char **argv)
 	while (i < argc)
 	{
 		if (all.av || (all.flags & P))
-		{
-			printf("dispatch\n");
 			dispatch(&all);
-		}
 		else if (*argv[i] == '-' && !(all.flags & S) && all.listen_flag)
 			is_valid_flag(&all, &argv[i++][1]);
 		else
@@ -181,9 +222,9 @@ int			main(int argc, char **argv)
 			dispatch(&all);
 		}
 	}
-	if (all.flags & S)
+	if (all.flags & S && !all.ac)
 		printf("%s: option requires an argument -- s\n", all.command);
-	else if (!all.ac || all.flags & P)
+	else if (!all.ac || all.flags & P || all.flags & S)
 		dispatch(&all);
 	return (0);
 }

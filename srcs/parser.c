@@ -6,13 +6,13 @@
 /*   By: nsondag <nsondag@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/28 15:28:37 by nsondag           #+#    #+#             */
-/*   Updated: 2020/09/28 15:28:39 by nsondag          ###   ########.fr       */
+/*   Updated: 2020/10/07 15:35:28 by nsondag          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/md5.h"
 
-int				ft_realloc(void **tab, int *size_av,
+int		ft_realloc(void **tab, int *size_av,
 		int new_size_ap, size_t type_size)
 {
 	char			*save;
@@ -37,36 +37,36 @@ int				ft_realloc(void **tab, int *size_av,
 	return (1);
 }
 
-int			read_all(char **str, int fd)
+int		read_all(char **str, int fd)
 {
 	int index;
 	int size;
 	int ret;
 
-	size = 28000 + 1;
+	size = BUFFER + 1;
 	if (!(*str = malloc(size * sizeof(char))))
-		return(0);
+		return (0);
 	index = 0;
-  ret = read(fd, *(str + index), 28000);
+	ret = read(fd, *str + index, BUFFER);
 	while (ret > 0)
 	{
 		index += ret;
 		(*str)[index] = 0;
-		if (ret < 28000)
+		if (ret < BUFFER)
 			return (index);
-		if (index + 28000 >= size - 1 &&
-		!ft_realloc((void **)str, &size, size * 2, sizeof(char)))
+		if (index + BUFFER >= size - 1 &&
+				!ft_realloc((void **)str, &size, size * 2, sizeof(char)))
 			return (0);
-    ret = read(fd, *(str + index), 28000);
+		ret = read(fd, *str + index, BUFFER);
 	}
 	if (ret < 0)
 		return (0);
 	return (index);
 }
 
-int parser(char *string, char *file, t_all *all)
+int		parser(char *string, char *file, t_all *all)
 {
-  int fd;
+	int fd;
 	int fd2;
 	int len;
 
@@ -78,15 +78,15 @@ int parser(char *string, char *file, t_all *all)
 		if (*string)
 			printf("%s", string);
 	}
-  else if (file && (fd = open(file, O_RDONLY)) == -1)
+	else if (file && (fd = open(file, O_RDONLY)) == -1)
 	{
 		printf("md5: %s: No such file or directory\n", file);
 		all->listen_flag = 0;
 		return (-1);
 	}
-  else if (file)
+	else if (file)
 	{
-    len = read_all(&string, fd);
+		len = read_all(&string, fd);
 		if (!len)
 		{
 			if ((fd2 = open(ft_strcat(file, "/"), O_RDONLY)) != -1)
@@ -109,6 +109,6 @@ int parser(char *string, char *file, t_all *all)
 	}
 	else
 		string = "";
-  all->message = string;
-  return (len);
+	all->message = string;
+	return (len);
 }
