@@ -6,11 +6,9 @@
 /*   By: nsondag <nsondag@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/29 17:20:11 by nsondag           #+#    #+#             */
-/*   Updated: 2020/09/29 17:44:36 by nsondag          ###   ########.fr       */
+/*   Updated: 2020/10/07 19:31:36 by nsondag          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-//TODO replace printfs!!!!
 
 #include "../includes/md5.h"
 

@@ -81,4 +81,6 @@ int 		 parser(char *string, char *file, t_all *all);
 int		show_commands(void);
 int is_command(char *command);
 int is_valid_flag(t_all *all, char *av);
+void			get_blocks(t_all *all, union u_word	**block, int *len);
+uint32_t		rev_int_byte(uint32_t nbr);
 #endif
