@@ -27,9 +27,9 @@ union u_word	*padding(union u_word *block, int len)
 	uint64_t		bit_len;
 	uint64_t		bit_len2;
 
-	if (!(word = malloc(16 * sizeof(*word))))
+	if (!(word = malloc(64 * sizeof(*word))))
 		return (NULL);
-	ft_bzero(word, 64);
+	ft_bzero(word, 256);
 	bit_len = ((uint64_t)len - 1) * 8;
 	bit_len2 = bit_len >> 32;
 	len = len % 64;
@@ -37,6 +37,21 @@ union u_word	*padding(union u_word *block, int len)
 	ft_memcpy(word + 14, &bit_len, 4);
 	ft_memcpy(word + 15, &bit_len2, 4);
 	return (word);
+}
+
+union u_word *prepare_sha256(union u_word *word)
+{
+	int i;
+
+	i = 16;
+
+	while (i < 64)
+	{
+		printf("i %d\n", i);
+		word[i].x = sum4(word[i - 2].x) + word[i - 7].x + sum3(word[i - 15].x) + word[i - 16].x;
+		i++;
+	}
+	return(word);
 }
 
 void			process_md5(t_all *all, union u_word	**block)
@@ -56,6 +71,28 @@ void			process_md5(t_all *all, union u_word	**block)
 	{
 		res[i] = rev_int_byte(res[i]);
 		printf("%08x", res[i]);
+	}
+}
+
+void			process_sha256(t_all *all, union u_word	**block)
+{
+	int			i;
+	uint32_t	*res;
+
+	if (!(res = malloc(256 * sizeof(*res))))
+		return ;
+	ft_bzero(res, 256);
+	i = -1;
+	while (++i < all->nb_blocks)
+		block[i] = prepare_sha256(block[i]);
+	i = 0;
+	while (i < all->nb_blocks)
+		res = ft_sha256(block[i++]);
+	i = -1;
+	while (++i < 8)
+	{
+		res[i] = rev_int_byte(res[i]);
+		printf("%08x ", res[i]);
 	}
 }
 
@@ -83,5 +120,6 @@ void			get_blocks(t_all *all, union u_word	**block, int *len)
 	if (i == all->nb_blocks)
 		i--;
 	block[i] = padding(block[i], *len);
-	process_md5(all, block);
+	//process_md5(all, block);
+	process_sha256(all, block);
 }

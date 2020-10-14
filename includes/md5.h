@@ -25,6 +25,14 @@
 # define B 0xefcdab89
 # define C 0x98badcfe
 # define D 0x10325476
+# define H1 0x6a09e667
+# define H2 0xbb67ae85
+# define H3 0x3c6ef372
+# define H4 0xa54ff53a
+# define H5 0x510e527f
+# define H6 0x9b05688c
+# define H7 0x1f83d9ab
+# define H8 0x5be0cd19
 # define FLAGS "pqrs"
 # define P 1
 # define Q 2
@@ -64,6 +72,19 @@ typedef struct s_all
 	t_md5	md5_vars;
 	t_sha256 sha256_vars;
 }	t_all;
+
+uint32_t sum1(uint32_t x);
+uint32_t sum2(uint32_t x);
+uint32_t sum3(uint32_t x);
+uint32_t sum4(uint32_t x);
+uint32_t maj(uint32_t x, uint32_t y, uint32_t z);
+uint32_t ch(uint32_t x, uint32_t y, uint32_t z);
+uint32_t	left_shift(uint32_t a, int s);
+uint32_t	right_rot(uint32_t a, int s);
+union u_word *prepare_sha256(union u_word *word);
+void			process_sha256(t_all *all, union u_word	**block);
+void			get_blocks(t_all *all, union u_word	**block, int *len);
+uint32_t	*ft_sha256(union u_word word[64]);
 
 void init_tab(t_md5 *vars);
 void init_s(t_md5 *vars);
