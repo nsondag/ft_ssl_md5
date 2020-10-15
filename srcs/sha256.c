@@ -27,17 +27,11 @@ uint32_t	*ft_sha256(union u_word word[64])
                     0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f,
                     0x682e6ff3, 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208,
                     0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2 };
-  uint32_t tmp_h[8] = {H1, H2, H3, H4, H5, H6, H7, H8};
+  static uint32_t tmp_h[8] = {H1, H2, H3, H4, H5, H6, H7, H8};
   uint32_t *h;
 	int			i;
   uint32_t t1;
   uint32_t t2;
-  uint32_t test;
-  int	shift;
-
-  printf("%u\n", left_shift(31416, 3));
-  printf("%u\n", right_rot(31416, 3));
-  printf("%u\n", left_rot(31416, 3));
 
   if (!(h = malloc(8 * sizeof(*h))))
 		return (NULL);
@@ -45,16 +39,7 @@ uint32_t	*ft_sha256(union u_word word[64])
   while (++i < 8)
   {
     h[i] = tmp_h[i];
-  }
-  i = 0;
-  while (i < 64)
-  {
-    printf("%x ", word[i].x);
-    printf("%c ", word[i].tab[0]);
-    printf("%c ", word[i].tab[1]);
-    printf("%c ", word[i].tab[2]);
-    printf("%c\n", word[i].tab[3]);
-    i++;
+    //printf("h %x\n", h[i]);
   }
 	i = -1;
 	while (++i < 64)
@@ -72,9 +57,6 @@ uint32_t	*ft_sha256(union u_word word[64])
 	}
 	i = -1;
 	while (++i < 8)
-  {
-		h[i] = h[i] + tmp_h[i];
-    printf("h[%d] = %x\n", i, h[i]);
-  }
-	return (h);
+		tmp_h[i] = h[i] + tmp_h[i];
+	return (tmp_h);
 }

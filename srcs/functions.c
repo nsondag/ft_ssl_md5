@@ -14,7 +14,7 @@
 
 uint32_t	left_rot(uint32_t a, int s)
 {
-	unsigned	mask;
+	unsigned int mask;
 
 	mask = (1 << s) - 1;
 	return ((a >> (32 - s)) & mask) | ((a << s) & ~mask);

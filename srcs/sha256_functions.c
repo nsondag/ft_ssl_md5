@@ -17,15 +17,13 @@ uint32_t	right_rot(uint32_t a, int s)
 	unsigned int mask;
 
 	mask = (1 << s) - 1;
-	//return((a << s) || a << ((32 - s)));
-	return ((a << (32 - s)) & mask) | ((a >> s) & ~mask);
+	return (a << (32 - s ) | (a >> s));
 }
 
 uint32_t	left_shift(uint32_t a, int s)
 {
 	return (a >> s);
 }
-
 
 uint32_t ch(uint32_t x, uint32_t y, uint32_t z)
 {
@@ -49,8 +47,6 @@ uint32_t sum2(uint32_t x)
 
 uint32_t sum3(uint32_t x)
 {
-	printf("((%x))\n", x);
-	printf("@ %x @ %x @ %x\n", right_rot(x,7), right_rot(x, 18), left_shift(x, 3));
   return (right_rot(x, 7) ^ right_rot(x, 18) ^ left_shift(x, 3));
 }
 
