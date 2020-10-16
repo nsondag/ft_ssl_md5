@@ -12,8 +12,8 @@
 
 #include "../includes/md5.h"
 
-int		ft_realloc(void **tab, int *size_av,
-		int new_size_ap, size_t type_size)
+int		ft_realloc(void **tab, size_t *size_av,
+		size_t new_size_ap, size_t type_size)
 {
 	char			*save;
 	unsigned int	size;
@@ -37,15 +37,18 @@ int		ft_realloc(void **tab, int *size_av,
 	return (1);
 }
 
-int		read_all(char **str, int fd)
+int64_t	read_all(char **str, int fd)
 {
-	int index;
-	int size;
-	int ret;
+	size_t index;
+	size_t size;
+	size_t ret;
 
 	size = BUFFER + 1;
 	if (!(*str = malloc(size * sizeof(char))))
+	{
+		printf("malloc error\n");
 		return (0);
+	}
 	index = 0;
 	ret = read(fd, *str + index, BUFFER);
 	while (ret > 0)
@@ -59,16 +62,18 @@ int		read_all(char **str, int fd)
 			return (0);
 		ret = read(fd, *str + index, BUFFER);
 	}
+	printf("after\n");
 	if (ret < 0)
 		return (0);
+	printf("%zu\n", index);
 	return (index);
 }
 
-int		parser(char *string, char *file, t_all *all)
+int64_t	parser(char *string, char *file, t_all *all)
 {
 	int fd;
 	int fd2;
-	int len;
+	int64_t len;
 
 	len = 0;
 	if (all->flags & P)
@@ -99,7 +104,7 @@ int		parser(char *string, char *file, t_all *all)
 		}
 		close(fd);
 		if (!(all->flags & Q) && !(all->flags & R))
-			printf("MD5 (%s) = ", file);
+			printf("MD5(%s) = ", file);
 		all->listen_flag = 0;
 	}
 	else if (all->read_entry)

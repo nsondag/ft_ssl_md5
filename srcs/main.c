@@ -22,7 +22,7 @@ int				process(char *av, t_all *all)
 {
 	union u_word	*result;
 	union u_word	**block;
-	int				len;
+	int64_t			len;
 	char			*string;
 
 	string = NULL;
@@ -37,7 +37,10 @@ int				process(char *av, t_all *all)
 	else
 	{
 		if ((len = parser(all->message, av, all)) < 0)
+		{
+			//printf("LLen %lld parsed\n", len);
 			return (0);
+		}
 		if (all->flags & P)
 		{
 			all->read_entry = 0;
@@ -59,10 +62,7 @@ int				process(char *av, t_all *all)
 
 int				dispatch(t_all *all)
 {
-	if (ft_strequ(all->command, "md5"))
-		process(all->av, all);
-	else if (ft_strequ(all->command, "sha256"))
-		printf("COMMING SOON!!!\n");
+	process(all->av, all);
 	free(all->av);
 	all->av = NULL;
 	return (0);

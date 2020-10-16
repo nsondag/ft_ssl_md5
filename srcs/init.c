@@ -14,6 +14,14 @@
 
 void	init_sha256(t_sha256 *vars)
 {
+	vars->h[0] = H1;
+	vars->h[1] = H2;
+	vars->h[2] = H3;
+	vars->h[3] = H4;
+	vars->h[4] = H5;
+	vars->h[5] = H6;
+	vars->h[6] = H7;
+	vars->h[7] = H8;
 }
 
 void	init_md5(t_md5 *vars)

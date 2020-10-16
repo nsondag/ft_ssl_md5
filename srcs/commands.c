@@ -12,9 +12,9 @@
 
 #include "../includes/md5.h"
 
-char	*g_md_commands[3] = {"md5", "sha256", "\0"};
-char	*g_cipher_commands[1] = {"\0"};
-char	*g_standard_commands[1] = {"\0"};
+static char	*g_md_commands[3] = {"md5", "sha256", "\0"};
+static char	*g_cipher_commands[1] = {"\0"};
+static char	*g_standard_commands[1] = {"\0"};
 
 int		show_commands(void)
 {

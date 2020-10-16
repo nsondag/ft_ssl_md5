@@ -55,8 +55,7 @@ typedef struct s_md5
 typedef struct s_sha256
 {
 	unsigned long tab[64];
-	int **s;
-	uint32_t abcd[4];
+	uint32_t h[8];
 }	t_sha256;
 
 typedef struct s_all
@@ -83,8 +82,7 @@ uint32_t	left_shift(uint32_t a, int s);
 uint32_t	right_rot(uint32_t a, int s);
 union u_word *prepare_sha256(union u_word *word);
 void			process_sha256(t_all *all, union u_word	**block);
-void			get_blocks(t_all *all, union u_word	**block, int *len);
-uint32_t	*ft_sha256(union u_word word[64]);
+uint32_t	*ft_sha256(union u_word word[64], t_sha256 *vars);
 
 void init_tab(t_md5 *vars);
 void init_s(t_md5 *vars);
@@ -98,10 +96,10 @@ uint32_t func_f(uint32_t abcd[4]);
 uint32_t func_g(uint32_t abcd[4]);
 uint32_t func_h(uint32_t abcd[4]);
 uint32_t func_i(uint32_t abcd[4]);
-int 		 parser(char *string, char *file, t_all *all);
+long long		parser(char *string, char *file, t_all *all);
 int		show_commands(void);
 int is_command(char *command);
 int is_valid_flag(t_all *all, char *av);
-void			get_blocks(t_all *all, union u_word	**block, int *len);
+void			get_blocks(t_all *all, union u_word	**block, int64_t *len);
 uint32_t		rev_int_byte(uint32_t nbr);
 #endif
