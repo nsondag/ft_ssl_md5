@@ -12,12 +12,6 @@
 
 #include "../includes/md5.h"
 
-uint32_t		rev_int_byte(uint32_t nbr)
-{
-	return ((nbr & 0xff) << 24 | (nbr & 0xff0000) >> 8 |
-			(nbr & 0xff00) << 8 | (nbr & 0xff000000) >> 24);
-}
-
 int				process(char *av, t_all *all)
 {
 	union u_word	*result;
@@ -68,16 +62,16 @@ int				dispatch(t_all *all)
 	return (0);
 }
 
-int				check_validity(int argc, char **argv)
+int				check_validity(int argc, char *argv)
 {
 	if (argc < 2)
 	{
 		printf("usage: ft_ssl command [command opts] [command args]\n");
 		return (0);
 	}
-	else if (!is_command(argv[1]))
+	else if (!is_command(argv))
 	{
-		printf("ft_ssl: Error '%s' is an invalid command.\n", argv[1]);
+		printf("ft_ssl: Error '%s' is an invalid command.\n", argv);
 		show_commands();
 		return (0);
 	}
@@ -90,14 +84,10 @@ int				main(int argc, char **argv)
 	int		i;
 	t_all	all;
 
-	if (!check_validity(argc, argv))
+	if (!check_validity(argc, argv[1]))
 		return (1);
 	init_all(&all);
-	ft_memcpy(all.command, argv[1], ft_strlen(argv[1]));
-	if (ft_strequ(all.command, "md5") == 1)
-		init_md5(&all.md5_vars);
-	else if (ft_strequ(all.command, "sha256") == 1)
-		init_sha256(&all.sha256_vars);
+	ft_strcpy(all.command, argv[1]);
 	i = 2;
 	while (i < argc)
 	{

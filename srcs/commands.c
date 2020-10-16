@@ -12,7 +12,7 @@
 
 #include "../includes/md5.h"
 
-static char	*g_md_commands[3] = {"md5", "sha256", "\0"};
+static char	*g_md_commands[3] = {"MD5", "SHA256", "\0"};
 static char	*g_cipher_commands[1] = {"\0"};
 static char	*g_standard_commands[1] = {"\0"};
 
@@ -39,10 +39,10 @@ int		is_command(char *command)
 {
 	int i;
 
-	i = 0;
-	while (g_md_commands[i])
+	i = -1;
+	while (*g_md_commands[++i])
 	{
-		if (ft_strequ(command, g_md_commands[i++]))
+		if (ft_strequ(command, g_md_commands[i]))
 			return (1);
 	}
 	return (0);

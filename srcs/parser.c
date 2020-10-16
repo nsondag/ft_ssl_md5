@@ -62,10 +62,8 @@ int64_t	read_all(char **str, int fd)
 			return (0);
 		ret = read(fd, *str + index, BUFFER);
 	}
-	printf("after\n");
 	if (ret < 0)
 		return (0);
-	printf("%zu\n", index);
 	return (index);
 }
 
@@ -104,7 +102,7 @@ int64_t	parser(char *string, char *file, t_all *all)
 		}
 		close(fd);
 		if (!(all->flags & Q) && !(all->flags & R))
-			printf("MD5(%s) = ", file);
+			printf("%s(%s)= ", all->command, file);
 		all->listen_flag = 0;
 	}
 	else if (all->read_entry)
