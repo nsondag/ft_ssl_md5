@@ -6,7 +6,7 @@
 /*   By: nsondag <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/06/14 19:21:07 by nsondag           #+#    #+#             */
-/*   Updated: 2018/11/29 23:56:55 by nsondag          ###   ########.fr       */
+/*   Updated: 2020/10/18 15:20:24 by nsondag          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,8 @@
 # include <unistd.h>
 # include <string.h>
 # include <stdlib.h>
-# define BUFF_SIZE 4
+# define BUFF_SIZE 512
+# define OPEN_MAX 1000
 
 typedef struct		s_list
 {

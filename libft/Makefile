@@ -6,7 +6,7 @@
 #    By: nsondag <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/06/14 21:09:08 by nsondag           #+#    #+#              #
-#    Updated: 2020/09/20 14:28:04 by nsondag          ###   ########.fr        #
+#    Updated: 2020/10/18 15:21:01 by nsondag          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -70,7 +70,8 @@ SRC =	ft_atoi.c\
 		ft_lstmap.c\
 		word_count.c\
 		ft_pow.c\
-		ft_strtoupper.c
+		ft_strtoupper.c\
+		get_next_line.c
 
 Bonus = ft_next_sqrt.c\
 		ft_sqrt.c\
