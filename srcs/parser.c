@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "../includes/md5.h"
+#include <errno.h>
 
 int		ft_realloc(void **tab, int64_t *size_av,
 		int64_t new_size_ap, int64_t type_size)
@@ -67,7 +68,6 @@ int64_t	read_all(char **str, int fd)
 int64_t	parser(char *string, char *file, t_all *all)
 {
 	int fd;
-	int fd2;
 	int64_t len;
 
 	len = 0;
@@ -75,37 +75,30 @@ int64_t	parser(char *string, char *file, t_all *all)
 	{
 		read_all(&string, 0);
 		close(0);
+		if (errno)
+			return(-printf("%s: %s: %s\n", all->command, file, strerror(errno)));
 		if (*string)
 			printf("%s", string);
 	}
-	else if (file && (fd = open(file, O_RDONLY)) == -1)
-	{
-		printf("md5: %s: No such file or directory\n", file);
-		all->listen_flag = 0;
-		return (-1);
-	}
 	else if (file)
 	{
+		fd = open(file, O_RDONLY);
+		if (errno)
+			return(-printf("%s: %s: %s\n", all->command, file, strerror(errno)));
 		len = read_all(&string, fd);
-		if (!len)
-		{
-			if ((fd2 = open(ft_strcat(file, "/"), O_RDONLY)) != -1)
-			{
-				printf("md5: %s: Is a directory\n", ft_strsub(file, 0, ft_strlen(file) - 1));
-				return (-1);
-			}
-			file = ft_strsub(file, 0, ft_strlen(file) - 1);
-			close(fd2);
-		}
 		close(fd);
+		if (errno)
+			return(-printf("%s: %s: %s\n", all->command, file, strerror(errno)));
 		if (!(all->flags & Q) && !(all->flags & R))
 			printf("%s(%s)= ", all->command, file);
 		all->listen_flag = 0;
 	}
-	else if (all->read_entry)
+ 	else if (all->read_entry)
 	{
 		read_all(&string, 0);
 		close(0);
+		if (errno)
+			return(-printf("%s: %s: %s\n", all->command, file, strerror(errno)));
 	}
 	else
 		string = "";

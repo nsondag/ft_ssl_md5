@@ -31,10 +31,7 @@ int				process(char *av, t_all *all)
 	else
 	{
 		if ((len = parser(all->message, av, all)) < 0)
-		{
-			//printf("LLen %lld parsed\n", len);
 			return (0);
-		}
 		if (all->flags & P)
 		{
 			all->read_entry = 0;
