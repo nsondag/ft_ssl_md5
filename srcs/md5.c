@@ -6,20 +6,20 @@
 /*   By: nsondag <nsondag@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/06 17:22:51 by nsondag           #+#    #+#             */
-/*   Updated: 2020/10/16 16:43:21 by nsondag          ###   ########.fr       */
+/*   Updated: 2020/10/18 12:45:11 by nsondag          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/md5.h"
 
-static	uint32_t	g_s[4][4] = {
+static uint32_t	g_s[4][4] = {
 	{7, 12, 17, 22},
 	{5, 9, 14, 20},
 	{4, 11, 16, 23},
 	{6, 10, 15, 21}
 };
 
-static uint32_t		g_tab[64] = {
+static uint32_t	g_tab[64] = {
 	0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
 	0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
 	0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be,
@@ -38,7 +38,7 @@ static uint32_t		g_tab[64] = {
 	0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391
 };
 
-static void			init_md5(uint32_t *vars)
+static void		init_md5(uint32_t *vars)
 {
 	vars[0] = 0x67452301;
 	vars[1] = 0xefcdab89;
@@ -46,7 +46,7 @@ static void			init_md5(uint32_t *vars)
 	vars[3] = 0x10325476;
 }
 
-static uint32_t		process_round(uint32_t *vars, union u_word word[16], int i)
+static uint32_t	process_round(uint32_t *vars, uint32_t word[16], int i)
 {
 	int			index;
 	uint32_t	a;
@@ -54,27 +54,27 @@ static uint32_t		process_round(uint32_t *vars, union u_word word[16], int i)
 	if (i < 16)
 	{
 		index = i % 16;
-		a = vars[0] + func_f(vars) + word[index].x + g_tab[i];
+		a = vars[0] + func_f(vars) + word[index] + g_tab[i];
 		return (vars[1] + left_rot(a, g_s[0][i % 4]));
 	}
 	else if (i < 32)
 	{
 		index = (5 * (i - 16) + 1) % 16;
-		a = vars[0] + func_g(vars) + word[index].x + g_tab[i];
+		a = vars[0] + func_g(vars) + word[index] + g_tab[i];
 		return (vars[1] + left_rot(a, g_s[1][i % 4]));
 	}
 	else if (i < 48)
 	{
 		index = (3 * (i - 32) + 5) % 16;
-		a = vars[0] + func_h(vars) + word[index].x + g_tab[i];
+		a = vars[0] + func_h(vars) + word[index] + g_tab[i];
 		return (vars[1] + left_rot(a, g_s[2][i % 4]));
 	}
 	index = (7 * (i - 48)) % 16;
-	a = vars[0] + func_i(vars) + word[index].x + g_tab[i];
+	a = vars[0] + func_i(vars) + word[index] + g_tab[i];
 	return (vars[1] + left_rot(a, g_s[3][i % 4]));
 }
 
-static uint32_t		*process_block_md5(union u_word word[16], uint32_t *vars)
+static uint32_t	*process_block_md5(uint32_t word[16], uint32_t *vars)
 {
 	uint32_t	tmp_vars[4];
 	uint32_t	tmp;
@@ -96,15 +96,23 @@ static uint32_t		*process_block_md5(union u_word word[16], uint32_t *vars)
 	return (vars);
 }
 
-void				ft_md5(t_all *all, union u_word	**block)
+void			ft_md5(t_all *all, uint32_t **block, int64_t len)
 {
-	int			i;
+	int64_t		i;
 	uint32_t	*res;
 
-	i = 0;
+	i = -1;
 	init_md5(all->vars);
-	while (i < all->nb_blocks)
-		res = process_block_md5(block[i++], all->vars);
+	while (++i < all->nb_blocks)
+	{
+		if (!(block[i] = malloc(64 * sizeof(**block))))
+			return ;
+		ft_memcpy(block[i], all->message + (i * 64), 64);
+		if (i == all->nb_blocks - 1)
+			block[i] = padding(block[i], len, all);
+		res = process_block_md5(block[i], all->vars);
+		free(block[i]);
+	}
 	i = -1;
 	while (++i < 4)
 	{

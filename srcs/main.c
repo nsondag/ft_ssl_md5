@@ -14,8 +14,8 @@
 
 int				process(char *av, t_all *all)
 {
-	union u_word	*result;
-	union u_word	**block;
+	uint32_t	*result;
+	uint32_t	**block;
 	int64_t			len;
 	char			*string;
 
@@ -58,6 +58,7 @@ int				dispatch(t_all *all)
 {
 	process(all->av, all);
 	free(all->av);
+	free(all->message);
 	all->av = NULL;
 	return (0);
 }

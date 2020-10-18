@@ -6,7 +6,7 @@
 /*   By: nsondag <nsondag@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 14:50:58 by nsondag           #+#    #+#             */
-/*   Updated: 2020/10/16 15:46:07 by nsondag          ###   ########.fr       */
+/*   Updated: 2020/10/18 12:45:23 by nsondag          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
  ** of the cube roots of the first 64 prime numbers.
 */
 
-static uint32_t		g_tab[64] = {
+static uint32_t	g_tab[64] = {
 	0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
 	0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
 	0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3,
@@ -35,7 +35,7 @@ static uint32_t		g_tab[64] = {
 	0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208,
 	0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2 };
 
-static	void		init_sha256(uint32_t *vars)
+static	void	init_sha256(uint32_t *vars)
 {
 	vars[0] = 0x6a09e667;
 	vars[1] = 0xbb67ae85;
@@ -47,24 +47,24 @@ static	void		init_sha256(uint32_t *vars)
 	vars[7] = 0x5be0cd19;
 }
 
-static union u_word	*prepare_block256(union u_word *word)
+static uint32_t	*prepare_block256(uint32_t *word)
 {
 	int i;
 
 	i = -1;
 	while (++i < 64)
-		word[i].x = rev_int_byte(word[i].x);
+		word[i] = rev_int_byte(word[i]);
 	i = 16;
 	while (i < 64)
 	{
-		word[i].x = sigma(word[i - 2].x, 4) + word[i - 7].x +
-			sigma(word[i - 15].x, 3) + word[i - 16].x;
+		word[i] = sigma(word[i - 2], 4) + word[i - 7] +
+			sigma(word[i - 15], 3) + word[i - 16];
 		i++;
 	}
 	return (word);
 }
 
-static uint32_t		*process_block256(union u_word word[64], uint32_t *vars)
+static uint32_t	*process_block256(uint32_t word[16], uint32_t *vars)
 {
 	uint32_t	h[8];
 	int			i;
@@ -78,7 +78,7 @@ static uint32_t		*process_block256(union u_word word[64], uint32_t *vars)
 	{
 		j = 8;
 		t1 = vars[7] + sigma(vars[4], 2) + ch(vars[4], vars[5], vars[6]) +
-					g_tab[i] + word[i].x;
+					g_tab[i] + word[i];
 		t2 = sigma(vars[0], 1) + maj(vars[0], vars[1], vars[2]);
 		while (j--)
 			vars[j] = vars[j - 1];
@@ -91,18 +91,24 @@ static uint32_t		*process_block256(union u_word word[64], uint32_t *vars)
 	return (vars);
 }
 
-void				ft_sha256(t_all *all, union u_word	**block)
+void			ft_sha256(t_all *all, uint32_t **block, int64_t len)
 {
-	int			i;
+	int64_t		i;
 	uint32_t	*res;
 
 	i = -1;
 	init_sha256(all->vars);
 	while (++i < all->nb_blocks)
+	{
+		if (!(block[i] = malloc(64 * sizeof(**block))))
+			return ;
+		ft_memcpy(block[i], all->message + (i * 64), 64);
+		if (i == all->nb_blocks - 1)
+			block[i] = padding(block[i], len, all);
 		block[i] = prepare_block256(block[i]);
-	i = 0;
-	while (i < all->nb_blocks)
-		res = process_block256(block[i++], all->vars);
+		res = process_block256(block[i], all->vars);
+		free(block[i]);
+	}
 	i = -1;
 	while (++i < 8)
 		printf("%08x", res[i]);

@@ -12,12 +12,12 @@
 
 #include "../includes/md5.h"
 
-int		ft_realloc(void **tab, size_t *size_av,
-		size_t new_size_ap, size_t type_size)
+int		ft_realloc(void **tab, int64_t *size_av,
+		int64_t new_size_ap, int64_t type_size)
 {
 	char			*save;
-	unsigned int	size;
-	unsigned int	new_size;
+	int64_t	size;
+	int64_t	new_size;
 
 	size = *size_av;
 	new_size = new_size_ap;
@@ -39,16 +39,13 @@ int		ft_realloc(void **tab, size_t *size_av,
 
 int64_t	read_all(char **str, int fd)
 {
-	size_t index;
-	size_t size;
-	size_t ret;
+	int64_t index;
+	int64_t size;
+	int64_t ret;
 
 	size = BUFFER + 1;
 	if (!(*str = malloc(size * sizeof(char))))
-	{
-		printf("malloc error\n");
 		return (0);
-	}
 	index = 0;
 	ret = read(fd, *str + index, BUFFER);
 	while (ret > 0)
