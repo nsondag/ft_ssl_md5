@@ -13,36 +13,95 @@
 #include "../includes/md5.h"
 #include <errno.h>
 
+int		ft_realloc(void **tab, int64_t *size_av,
+		int64_t new_size_ap, int64_t type_size)
+{
+	char			*save;
+	int64_t	size;
+	int64_t	new_size;
+
+	size = *size_av;
+	new_size = new_size_ap;
+	if (new_size == size)
+		return (1);
+	if (!(save = malloc(new_size * type_size)))
+		return (0);
+	if (size)
+	{
+		ft_memcpy(save, *tab, size * type_size);
+		free(*tab);
+	}
+	*tab = save;
+	if (new_size > size)
+		ft_memset(*tab + size, 0, (new_size - size) * type_size);
+	*size_av = new_size;
+	return (1);
+}
+
+int64_t	read_all(char **str, int fd)
+{
+	int64_t index;
+	int64_t size;
+	int64_t ret;
+
+	size = BUFFER + 1;
+	if (!(*str = malloc(size * sizeof(char))))
+		return (0);
+	index = 0;
+	ret = read(fd, *str + index, BUFFER);
+	while (ret > 0)
+	{
+		index += ret;
+		(*str)[index] = 0;
+		if (ret < BUFFER)
+			return (index);
+		if (index + BUFFER >= size - 1 &&
+				!ft_realloc((void **)str, &size, size * 2, sizeof(char)))
+			return (0);
+		ret = read(fd, *str + index, BUFFER);
+	}
+	if (ret < 0)
+		return (0);
+	return (index);
+}
+
 int64_t	parser(char *string, char *file, t_all *all)
 {
 	int fd;
 	int64_t len;
-	int			ret;
 
 	len = 0;
-	if (all->flags & P || (all->read_entry && !file))
+	if (all->flags & P)
 	{
-		fd = 0;
-		if (string && *string)
+		read_all(&string, 0);
+		close(0);
+		if (errno)
+			return(-printf("%s: %s: %s\n", all->command, file, strerror(errno)));
+		if (*string)
 			printf("%s", string);
 	}
 	else if (file)
-		fd = open(file, O_RDONLY);
-	if (errno)
-		return(-printf("%s: %s: %s\n", all->command, file, strerror(errno)));
-	if (!(all->message = malloc(512 * sizeof(char))))
-		return (0);
-	while ((ret = read(fd, all->message, 512)) >= 0)
 	{
-		len += ret;
-		if (fd && len < 512)
-			break ;
-		if (!all->message[len - 1])
-			break ;
+		fd = open(file, O_RDONLY);
+		if (errno)
+			return(-printf("%s: %s: %s\n", all->command, file, strerror(errno)));
+		len = read_all(&string, fd);
+		close(fd);
+		if (errno)
+			return(-printf("%s: %s: %s\n", all->command, file, strerror(errno)));
+		if (!(all->flags & Q) && !(all->flags & R))
+			printf("%s(%s)= ", all->command, file);
+		all->listen_flag = 0;
 	}
-	close(fd);
-	if (errno)
-		return(-printf("%s: %s: %s\n", all->command, file, strerror(errno)));
-	all->listen_flag = 0;
+ 	else if (all->read_entry)
+	{
+		read_all(&string, 0);
+		close(0);
+		if (errno)
+			return(-printf("%s: %s: %s\n", all->command, file, strerror(errno)));
+	}
+	else
+		string = "";
+	all->message = string;
 	return (len);
 }

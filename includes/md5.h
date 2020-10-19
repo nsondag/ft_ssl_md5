@@ -28,7 +28,7 @@
 
 typedef	struct	s_all
 {
-	char		*message[512];
+	char		*message;
 	int			nb_blocks;
 	char		*av;
 	int			flags;
