@@ -6,7 +6,7 @@
 /*   By: nsondag <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/06/14 19:21:07 by nsondag           #+#    #+#             */
-/*   Updated: 2018/11/29 23:56:55 by nsondag          ###   ########.fr       */
+/*   Updated: 2020/10/19 11:58:08 by nsondag          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,9 +92,7 @@ int					ft_atoi_base(const char *str, int base);
 int					ft_issorted(int *tab, int len);
 int					ft_isrevsorted(int *tab, int len);
 size_t				word_count(const char *s, char c);
-void        ft_strtoupper(void *dst, const void *src);
-
-int		get_next_line(const int fd, char **line);
-int ft_pow(int a, int x);
+void				ft_strtoupper(void *dst, const void *src);
+int					ft_pow(int a, int x);
 
 #endif

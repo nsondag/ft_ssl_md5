@@ -94,6 +94,7 @@ static uint32_t	*process_block_md5(uint32_t word[16], uint32_t *vars)
 	while (++i < 4)
 		vars[i] = vars[i] + tmp_vars[i];
 	return (vars);
+	i = 0;
 }
 
 void			ft_md5(t_all *all, uint32_t **block, int64_t len)

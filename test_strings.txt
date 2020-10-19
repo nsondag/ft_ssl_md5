@@ -1,7 +1,0 @@
-"pickle rick 123123123123121231231212312347terrtwygfffftry698456"
-./ft_ssl md5 -s"" seg fault!!!!
-echo "pickle rick" | md5 -p -s "rwt" -s -p -pr -s -p -p -pr -p
-echo "test" | md5   -s "rweg " -p "errw" -p
-echo "test" | md5 -s a -s b -s c -s d -r -sqr -s -qrw -r -s -qr -qr -p -p -p -p -qr test0 -rq -p
-
-erreur si longueur plus grande que rentre dans un mot???!!!

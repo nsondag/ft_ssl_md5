@@ -6,7 +6,7 @@
 /*   By: nsondag <nsondag@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/28 15:28:37 by nsondag           #+#    #+#             */
-/*   Updated: 2020/10/07 15:35:28 by nsondag          ###   ########.fr       */
+/*   Updated: 2020/10/19 12:37:21 by nsondag          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 int		ft_realloc(void **tab, int64_t *size_av,
 		int64_t new_size_ap, int64_t type_size)
 {
-	char			*save;
+	char	*save;
 	int64_t	size;
 	int64_t	new_size;
 
@@ -53,8 +53,6 @@ int64_t	read_all(char **str, int fd)
 	{
 		index += ret;
 		(*str)[index] = 0;
-		if (ret < BUFFER)
-			return (index);
 		if (index + BUFFER >= size - 1 &&
 				!ft_realloc((void **)str, &size, size * 2, sizeof(char)))
 			return (0);
@@ -67,41 +65,28 @@ int64_t	read_all(char **str, int fd)
 
 int64_t	parser(char *string, char *file, t_all *all)
 {
-	int fd;
+	int		fd;
 	int64_t len;
 
 	len = 0;
-	if (all->flags & P)
-	{
-		read_all(&string, 0);
-		close(0);
-		if (errno)
-			return(-printf("%s: %s: %s\n", all->command, file, strerror(errno)));
-		if (*string)
-			printf("%s", string);
-	}
+	if (all->flags & P || (all->read_entry && !file))
+		fd = 0;
 	else if (file)
 	{
 		fd = open(file, O_RDONLY);
-		if (errno)
-			return(-printf("%s: %s: %s\n", all->command, file, strerror(errno)));
-		len = read_all(&string, fd);
-		close(fd);
-		if (errno)
-			return(-printf("%s: %s: %s\n", all->command, file, strerror(errno)));
-		if (!(all->flags & Q) && !(all->flags & R))
-			printf("%s(%s)= ", all->command, file);
 		all->listen_flag = 0;
 	}
- 	else if (all->read_entry)
-	{
-		read_all(&string, 0);
-		close(0);
-		if (errno)
-			return(-printf("%s: %s: %s\n", all->command, file, strerror(errno)));
-	}
-	else
-		string = "";
+	if (errno)
+		return (-printf("%s: %s: %s\n", all->command, file, strerror(errno)));
+	len = read_all(&string, fd);
+	close(fd);
+	if (errno)
+		return (-printf("%s: %s: %s\n", all->command, file, strerror(errno)));
+	if ((!(all->flags & Q) && !(all->flags & R)) && file)
+		printf("%s(%s)= ", all->command, file);
+	if ((string && all->flags & P) && (!(all->flags & Q) && !(all->flags & R))
+			&& !file)
+		printf("%s", string);
 	all->message = string;
 	return (len);
 }

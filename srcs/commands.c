@@ -39,6 +39,7 @@ int		is_command(char *command)
 {
 	int i;
 
+	ft_strtoupper(command, command);
 	i = -1;
 	while (*g_md_commands[++i])
 	{

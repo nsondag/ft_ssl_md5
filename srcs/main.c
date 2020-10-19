@@ -23,10 +23,9 @@ int				process(char *av, t_all *all)
 	len = 0;
 	if (all->flags & S && all->listen_flag)
 	{
-		all->flags &= ~S;
 		all->message = av;
 		if (!(all->flags & Q) && !(all->flags & R))
-			printf("%s (\"%s\") = ", all->command, all->message);
+			printf("%s(\"%s\")= ", all->command, all->message);
 	}
 	else
 	{
@@ -44,18 +43,23 @@ int				process(char *av, t_all *all)
 		len = ft_strlen(all->message);
 	get_blocks(all, block, &len);
 	all->message[len - 1] = 0;
-	if ((all->flags & R) && !(all->flags & Q) && *all->message)
-		printf(" \"%s\"\n", all->message);
+	if ((all->flags & R) && !(all->flags & Q) && all->av)
+	{
+		if (all->flags & S)
+			printf(" \"%s\"\n", all->av);
+		else
+			printf(" %s\n", all->av);
+	}
 	else
 		printf("\n");
+	if (all->flags & S)
+		all->flags &= ~S;
 	return (0);
 }
 
 int				dispatch(t_all *all)
 {
 	process(all->av, all);
-	free(all->av);
-	free(all->message);
 	all->av = NULL;
 	return (0);
 }
@@ -106,5 +110,7 @@ int				main(int argc, char **argv)
 		printf("%s: option requires an argument -- s\n", all.command);
 	else if (!all.ac || all.flags & P || all.flags & S)
 		dispatch(&all);
+	free(all.message);
+	free(all.av);
 	return (0);
 }

@@ -53,7 +53,6 @@ void		get_blocks(t_all *all, uint32_t **block, int64_t *len)
 		all->nb_blocks++;
 	if (!(block = malloc(all->nb_blocks * sizeof(*block))))
 		return ;
-	i = -1;
 	*len += 1;
 	if (ft_strequ(all->command, "MD5"))
 		ft_md5(all, block, *len);
