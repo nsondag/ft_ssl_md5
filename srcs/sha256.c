@@ -95,6 +95,7 @@ void			ft_sha256(t_all *all, uint32_t **block, int64_t len)
 {
 	int64_t		i;
 	uint32_t	*res;
+	int				to_copy;
 
 	i = -1;
 	init_sha256(all->vars);
@@ -102,7 +103,11 @@ void			ft_sha256(t_all *all, uint32_t **block, int64_t len)
 	{
 		if (!(block[i] = malloc(64 * sizeof(**block))))
 			return ;
-		ft_memcpy(block[i], all->message + (i * 64), 64);
+		if (len < 64)
+			to_copy = len;
+		else
+			to_copy = 64;
+		ft_memcpy(block[i], all->message + (i * 64), to_copy);
 		if (i == all->nb_blocks - 1)
 			block[i] = padding(block[i], len, all);
 		block[i] = prepare_block256(block[i]);

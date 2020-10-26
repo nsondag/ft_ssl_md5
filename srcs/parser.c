@@ -48,6 +48,7 @@ int64_t	read_all(char **str, int fd)
 	if (!(*str = malloc(size * sizeof(char))))
 		return (0);
 	index = 0;
+	ft_bzero(*str, size);
 	ret = read(fd, *str + index, BUFFER);
 	while (ret > 0)
 	{

@@ -81,6 +81,9 @@ static uint32_t	*process_block_md5(uint32_t word[16], uint32_t *vars)
 	int			i;
 
 	ft_memcpy(tmp_vars, vars, 16);
+	i = 0;
+	while (i < 16)
+		printf("%x\n", word[i++]);
 	i = -1;
 	while (++i < 64)
 	{
@@ -101,14 +104,20 @@ void			ft_md5(t_all *all, uint32_t **block, int64_t len)
 {
 	int64_t		i;
 	uint32_t	*res;
+	int				to_copy;
 
 	i = -1;
+	res = NULL;
 	init_md5(all->vars);
 	while (++i < all->nb_blocks)
 	{
 		if (!(block[i] = malloc(64 * sizeof(**block))))
 			return ;
-		ft_memcpy(block[i], all->message + (i * 64), 64);
+		if (len < 64)
+			to_copy = len;
+		else
+			to_copy = 64;
+		ft_memcpy(block[i], all->message + (i * 64), to_copy);
 		if (i == all->nb_blocks - 1)
 			block[i] = padding(block[i], len, all);
 		res = process_block_md5(block[i], all->vars);

@@ -24,7 +24,13 @@ for l in {1..100}; do
 
 	o_openssl=$(md5 $FILENAME)
 	o_ft_ssl_md5=$(./ft_ssl md5 $FILENAME)
+	o_openssl2=$(openssl sha256 $FILENAME)
+	o_ft_ssl_sha256=$(./ft_ssl sha256 $FILENAME)
 	if diff <(echo ${o_openssl// /}) <(echo ${o_ft_ssl_md5// /}); then; else
+		echo "\n${RED}ERROR occured with file: $FILENAME"
+		exit 1
+	fi
+	if diff <(echo ${o_openssl2// /}) <(echo ${o_ft_ssl_sha256// /}); then; else
 		echo "\n${RED}ERROR occured with file: $FILENAME"
 		exit 1
 	fi
