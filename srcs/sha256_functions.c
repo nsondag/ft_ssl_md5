@@ -12,17 +12,17 @@
 
 #include "../includes/md5.h"
 
-uint32_t	ch(uint32_t x, uint32_t y, uint32_t z)
+u_int32_t	ch(u_int32_t x, u_int32_t y, u_int32_t z)
 {
 	return ((x & y) ^ (~x & z));
 }
 
-uint32_t	maj(uint32_t x, uint32_t y, uint32_t z)
+u_int32_t	maj(u_int32_t x, u_int32_t y, u_int32_t z)
 {
 	return ((x & y) ^ (x & z) ^ (y & z));
 }
 
-uint32_t	sigma(uint32_t x, int i)
+u_int32_t	sigma(u_int32_t x, int i)
 {
 	if (i == 1)
 		return (right_rot(x, 2) ^ right_rot(x, 13) ^ right_rot(x, 22));

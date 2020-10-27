@@ -70,6 +70,7 @@ int64_t	parse(char *string, char *f, t_all *all)
 	int64_t len;
 
 	len = 0;
+	errno = 0;
 	if (all->flags & P || (all->read_entry && !f))
 		fd = 0;
 	else if (f)

@@ -12,22 +12,22 @@
 
 #include "../includes/md5.h"
 
-uint32_t	func_f(uint32_t abcd[4])
+u_int32_t	func_f(u_int32_t abcd[4])
 {
 	return ((abcd[1] & abcd[2]) | (~abcd[1] & abcd[3]));
 }
 
-uint32_t	func_g(uint32_t abcd[4])
+u_int32_t	func_g(u_int32_t abcd[4])
 {
 	return ((abcd[1] & abcd[3]) | (abcd[2] & (~abcd[3])));
 }
 
-uint32_t	func_h(uint32_t abcd[4])
+u_int32_t	func_h(u_int32_t abcd[4])
 {
 	return (abcd[1] ^ abcd[2] ^ abcd[3]);
 }
 
-uint32_t	func_i(uint32_t abcd[4])
+u_int32_t	func_i(u_int32_t abcd[4])
 {
 	return (abcd[2] ^ (abcd[1] | ~abcd[3]));
 }

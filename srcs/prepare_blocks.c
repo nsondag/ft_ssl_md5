@@ -21,14 +21,14 @@
 ** message
 */
 
-uint32_t	*padding(uint32_t *block, int64_t len, t_all *all)
+u_int32_t	*padding(u_int32_t *block, int64_t len, t_all *all)
 {
-	uint64_t	bit_len;
-	uint64_t	bit_len2;
+	u_int64_t	bit_len;
+	u_int64_t	bit_len2;
 	int			i;
 
 	i = 0;
-	bit_len = ((uint64_t)len - 1) * 8;
+	bit_len = ((u_int64_t)len - 1) * 8;
 	bit_len2 = bit_len >> 32;
 	if (ft_strequ(all->command, "SHA256"))
 	{
@@ -42,7 +42,7 @@ uint32_t	*padding(uint32_t *block, int64_t len, t_all *all)
 	return (block);
 }
 
-void		get_blocks(t_all *all, uint32_t **block, int64_t *len)
+void		get_blocks(t_all *all, u_int32_t **block, int64_t *len)
 {
 	int64_t i;
 

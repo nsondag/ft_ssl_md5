@@ -19,7 +19,7 @@ INCLS = includes/
 LIB = libft/
 HEADERS = md5.h
 H = $(addprefix $(INCLS), $(HEADERS))
-FILES = main.c md5_functions.c parse.c commands.c init.c md5.c prepare_blocks.c \
+FILES = main.c md5_functions.c parse.c commands.c md5.c prepare_blocks.c \
 				sha256_functions.c sha256.c shifts.c
 OBJS := $(addprefix $(SRCS), $(FILES:%.c=%.o))
 

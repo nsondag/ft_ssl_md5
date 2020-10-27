@@ -6,7 +6,7 @@
 /*   By: nsondag <nsondag@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 14:50:58 by nsondag           #+#    #+#             */
-/*   Updated: 2020/10/27 13:05:38 by nsondag          ###   ########.fr       */
+/*   Updated: 2020/10/27 16:20:31 by nsondag          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
  ** of the cube roots of the first 64 prime numbers.
 */
 
-static uint32_t	g_tab[64] = {
+static u_int32_t	g_tab[64] = {
 	0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
 	0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
 	0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3,
@@ -35,7 +35,7 @@ static uint32_t	g_tab[64] = {
 	0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208,
 	0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2 };
 
-static	void	init_sha256(uint32_t *vars)
+static	void		init_sha256(u_int32_t *vars)
 {
 	vars[0] = 0x6a09e667;
 	vars[1] = 0xbb67ae85;
@@ -47,7 +47,7 @@ static	void	init_sha256(uint32_t *vars)
 	vars[7] = 0x5be0cd19;
 }
 
-static uint32_t	*prepare_block256(uint32_t *word)
+static u_int32_t	*prepare_block256(u_int32_t *word)
 {
 	int i;
 
@@ -64,13 +64,13 @@ static uint32_t	*prepare_block256(uint32_t *word)
 	return (word);
 }
 
-static uint32_t	*process_block256(uint32_t word[16], uint32_t *vars)
+static u_int32_t	*process_block256(u_int32_t word[16], u_int32_t *vars)
 {
-	uint32_t	h[8];
+	u_int32_t	h[8];
 	int			i;
 	int			j;
-	uint32_t	t1;
-	uint32_t	t2;
+	u_int32_t	t1;
+	u_int32_t	t2;
 
 	ft_memcpy(h, vars, 32);
 	i = -1;
@@ -91,10 +91,10 @@ static uint32_t	*process_block256(uint32_t word[16], uint32_t *vars)
 	return (vars);
 }
 
-void			ft_sha256(t_all *all, uint32_t **block, int64_t len)
+void				ft_sha256(t_all *all, u_int32_t **block, int64_t len)
 {
 	int64_t		i;
-	uint32_t	*res;
+	u_int32_t	*res;
 	int			to_copy;
 
 	i = -1;

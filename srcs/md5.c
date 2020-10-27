@@ -6,20 +6,20 @@
 /*   By: nsondag <nsondag@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/06 17:22:51 by nsondag           #+#    #+#             */
-/*   Updated: 2020/10/27 13:05:17 by nsondag          ###   ########.fr       */
+/*   Updated: 2020/10/27 16:19:59 by nsondag          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/md5.h"
 
-static uint32_t	g_s[4][4] = {
+static u_int32_t	g_s[4][4] = {
 	{7, 12, 17, 22},
 	{5, 9, 14, 20},
 	{4, 11, 16, 23},
 	{6, 10, 15, 21}
 };
 
-static uint32_t	g_tab[64] = {
+static u_int32_t	g_tab[64] = {
 	0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
 	0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
 	0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be,
@@ -38,7 +38,7 @@ static uint32_t	g_tab[64] = {
 	0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391
 };
 
-static void		init_md5(uint32_t *vars)
+static void			init_md5(u_int32_t *vars)
 {
 	vars[0] = 0x67452301;
 	vars[1] = 0xefcdab89;
@@ -46,10 +46,10 @@ static void		init_md5(uint32_t *vars)
 	vars[3] = 0x10325476;
 }
 
-static uint32_t	process_round(uint32_t *vars, uint32_t word[16], int i)
+static u_int32_t	process_round(u_int32_t *vars, u_int32_t word[16], int i)
 {
 	int			index;
-	uint32_t	a;
+	u_int32_t	a;
 
 	if (i < 16)
 	{
@@ -74,10 +74,10 @@ static uint32_t	process_round(uint32_t *vars, uint32_t word[16], int i)
 	return (vars[1] + left_rot(a, g_s[3][i % 4]));
 }
 
-static uint32_t	*process_block_md5(uint32_t word[16], uint32_t *vars)
+static u_int32_t	*process_block_md5(u_int32_t word[16], u_int32_t *vars)
 {
-	uint32_t	tmp_vars[4];
-	uint32_t	tmp;
+	u_int32_t	tmp_vars[4];
+	u_int32_t	tmp;
 	int			i;
 
 	ft_memcpy(tmp_vars, vars, 16);
@@ -97,10 +97,10 @@ static uint32_t	*process_block_md5(uint32_t word[16], uint32_t *vars)
 	i = 0;
 }
 
-void			ft_md5(t_all *all, uint32_t **block, int64_t len)
+void				ft_md5(t_all *all, u_int32_t **block, int64_t len)
 {
 	int64_t		i;
-	uint32_t	*res;
+	u_int32_t	*res;
 	int			to_copy;
 
 	i = -1;
@@ -122,8 +122,5 @@ void			ft_md5(t_all *all, uint32_t **block, int64_t len)
 	}
 	i = -1;
 	while (++i < 4)
-	{
-		res[i] = rev_int_byte(res[i]);
-		ft_printf("%08x", res[i]);
-	}
+		ft_printf("%08x", rev_int_byte(res[i]));
 }
