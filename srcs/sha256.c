@@ -117,5 +117,5 @@ void			ft_sha256(t_all *all, uint32_t **block, int64_t len)
 	}
 	i = -1;
 	while (++i < 8)
-		printf("%08x", res[i]);
+		ft_printf("%08x", res[i]);
 }

@@ -1,22 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_swap.c                                          :+:      :+:    :+:   */
+/*   u_count.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nsondag <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/07/03 18:48:27 by nsondag           #+#    #+#             */
-/*   Updated: 2018/11/28 19:23:20 by nsondag          ###   ########.fr       */
+/*   Created: 2018/09/25 12:57:07 by nsondag           #+#    #+#             */
+/*   Updated: 2018/10/09 15:02:21 by nsondag          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void	ft_swap(int *a, int *b)
+int		u_count(uintmax_t n, int base)
 {
-	int c;
+	int count;
 
-	c = *b;
-	*b = *a;
-	*a = c;
+	count = 0;
+	if (n == 0)
+		return (1);
+	while (n > 0)
+	{
+		n = n / base;
+		count++;
+	}
+	return (count);
 }

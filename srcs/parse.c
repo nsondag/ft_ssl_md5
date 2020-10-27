@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parser.c                                           :+:      :+:    :+:   */
+/*   parse.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nsondag <nsondag@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/28 15:28:37 by nsondag           #+#    #+#             */
-/*   Updated: 2020/10/19 12:37:21 by nsondag          ###   ########.fr       */
+/*   Updated: 2020/10/27 13:45:01 by nsondag          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,30 +64,30 @@ int64_t	read_all(char **str, int fd)
 	return (index);
 }
 
-int64_t	parser(char *string, char *file, t_all *all)
+int64_t	parse(char *string, char *f, t_all *all)
 {
 	int		fd;
 	int64_t len;
 
 	len = 0;
-	if (all->flags & P || (all->read_entry && !file))
+	if (all->flags & P || (all->read_entry && !f))
 		fd = 0;
-	else if (file)
+	else if (f)
 	{
-		fd = open(file, O_RDONLY);
+		fd = open(f, O_RDONLY);
 		all->listen_flag = 0;
 	}
 	if (errno)
-		return (-printf("%s: %s: %s\n", all->command, file, strerror(errno)));
+		return (-ft_printf("%s: %s: %s\n", all->command, f, strerror(errno)));
 	len = read_all(&string, fd);
 	close(fd);
 	if (errno)
-		return (-printf("%s: %s: %s\n", all->command, file, strerror(errno)));
-	if ((!(all->flags & Q) && !(all->flags & R)) && file)
-		printf("%s(%s)= ", all->command, file);
+		return (-ft_printf("%s: %s: %s\n", all->command, f, strerror(errno)));
+	if ((!(all->flags & Q) && !(all->flags & R)) && f)
+		ft_printf("%s(%s)= ", all->command, f);
 	if ((string && all->flags & P) && (!(all->flags & Q) && !(all->flags & R))
-			&& !file)
-		printf("%s", string);
+			&& !f)
+		ft_printf("%s", string);
 	all->message = string;
 	return (len);
 }

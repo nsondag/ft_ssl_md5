@@ -20,18 +20,18 @@ int		show_commands(void)
 {
 	int i;
 
-	printf("\nStandard commands:\n");
+	ft_printf("\nStandard commands:\n");
 	i = 0;
 	while (*g_standard_commands[i])
-		printf("%s\n", g_standard_commands[i++]);
-	printf("\nMessage Digest commands:\n");
+		ft_printf("%s\n", g_standard_commands[i++]);
+	ft_printf("\nMessage Digest commands:\n");
 	i = 0;
 	while (*g_md_commands[i])
-		printf("%s\n", g_md_commands[i++]);
-	printf("\nCipher commands:\n");
+		ft_printf("%s\n", g_md_commands[i++]);
+	ft_printf("\nCipher commands:\n");
 	i = 0;
 	while (*g_cipher_commands[i])
-		printf("%s\n", g_cipher_commands[i++]);
+		ft_printf("%s\n", g_cipher_commands[i++]);
 	return (0);
 }
 
@@ -56,7 +56,7 @@ int		is_valid_flag(t_all *all, char *av)
 	i = 0;
 	while (av[i])
 	{
-		if (ft_strchr(FLAGS, av[i]))
+		if (ft_strchr(FLAG, av[i]))
 		{
 			all->flags |= (int)ft_pow(2, av[i++] - 'p');
 			if (all->flags & S && av[i])
@@ -70,7 +70,7 @@ int		is_valid_flag(t_all *all, char *av)
 		}
 		else
 		{
-			printf("%s: illegal option -- %c\n", all->command, av[i]);
+			ft_printf("%s: illegal option -- %c\n", all->command, av[i]);
 			return (1);
 		}
 	}

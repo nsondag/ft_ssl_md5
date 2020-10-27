@@ -25,17 +25,17 @@ int				process(char *av, t_all *all)
 	{
 		all->message = av;
 		if (!(all->flags & Q) && !(all->flags & R))
-			printf("%s(\"%s\")= ", all->command, all->message);
+			ft_printf("%s(\"%s\")= ", all->command, all->message);
 	}
 	else
 	{
-		if ((len = parser(all->message, av, all)) < 0)
+		if ((len = parse(all->message, av, all)) < 0)
 			return (0);
 		if (all->flags & P)
 		{
 			all->read_entry = 0;
 			if (all->read_entry)
-				printf("\n");
+				ft_printf("\n");
 			all->flags &= ~P;
 		}
 	}
@@ -47,12 +47,12 @@ int				process(char *av, t_all *all)
 	if ((all->flags & R) && !(all->flags & Q) && all->av)
 	{
 		if (all->flags & S)
-			printf(" \"%s\"\n", all->av);
+			ft_printf(" \"%s\"\n", all->av);
 		else
-			printf(" %s\n", all->av);
+			ft_printf(" %s\n", all->av);
 	}
 	else
-		printf("\n");
+		ft_printf("\n");
 	if (all->flags & S)
 		all->flags &= ~S;
 	return (0);
@@ -70,12 +70,12 @@ int				check_validity(int argc, char *argv)
 {
 	if (argc < 2)
 	{
-		printf("usage: ft_ssl command [command opts] [command args]\n");
+		ft_printf("usage: ft_ssl command [command opts] [command args]\n");
 		return (0);
 	}
 	else if (!is_command(argv))
 	{
-		printf("ft_ssl: Error '%s' is an invalid command.\n", argv);
+		ft_printf("ft_ssl: Error '%s' is an invalid command.\n", argv);
 		show_commands();
 		return (0);
 	}
@@ -109,7 +109,7 @@ int				main(int argc, char **argv)
 		}
 	}
 	if (all.flags & S && !all.ac)
-		printf("%s: option requires an argument -- s\n", all.command);
+		ft_printf("%s: option requires an argument -- s\n", all.command);
 	else if (!all.ac || all.flags & P || all.flags & S)
 		dispatch(&all);
 	return (0);

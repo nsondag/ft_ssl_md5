@@ -124,6 +124,6 @@ void			ft_md5(t_all *all, uint32_t **block, int64_t len)
 	while (++i < 4)
 	{
 		res[i] = rev_int_byte(res[i]);
-		printf("%08x", res[i]);
+		ft_printf("%08x", res[i]);
 	}
 }

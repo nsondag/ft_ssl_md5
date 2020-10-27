@@ -1,0 +1,10 @@
+md5 -sHello world
+./ft_ssl md5 -sHello world
+echo -n Hello World | openssl md5
+echo -n Hello World | ./ft_ssl md5
+
+echo -n Hello World | openssl sha256
+echo -n Hello World | ./ft_ssl sha256
+echo -n Hello World | ./ft_ssl -p sha256
+echo -n Hello World | ./ft_ssl sha256 -p
+echo -n Hello World | openssl sha256

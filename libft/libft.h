@@ -6,7 +6,7 @@
 /*   By: nsondag <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/06/14 19:21:07 by nsondag           #+#    #+#             */
-/*   Updated: 2020/10/19 11:58:08 by nsondag          ###   ########.fr       */
+/*   Updated: 2020/10/27 13:41:38 by nsondag          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 # include <unistd.h>
 # include <string.h>
 # include <stdlib.h>
+# include "ft_printf.h"
 # define BUFF_SIZE 4
 
 typedef struct		s_list
@@ -39,6 +40,7 @@ void				*ft_memmove(void *dst, const void *src, size_t len);
 void				*ft_memchr(const void *s, int c, size_t n);
 int					ft_memcmp(const void *s1, const void *s2, size_t n);
 size_t				ft_strlen(const char *s);
+size_t				sp_strlen(const char *s);
 char				*ft_strdup(const char *s1);
 char				*ft_strcpy(char *dst, const char *src);
 char				*ft_strncpy(char *dst, const char *src, size_t len);
@@ -87,12 +89,13 @@ void				ft_putnbr_fd(int n, int fd);
 
 int					ft_sqrt(unsigned int nbr);
 int					ft_next_sqrt(unsigned int nbr);
-int					ft_swap(int *a, int *b);
 int					ft_atoi_base(const char *str, int base);
 int					ft_issorted(int *tab, int len);
 int					ft_isrevsorted(int *tab, int len);
 size_t				word_count(const char *s, char c);
 void				ft_strtoupper(void *dst, const void *src);
 int					ft_pow(int a, int x);
+int					count(intmax_t n, int base);
+int					u_count(uintmax_t n, int base);
 
 #endif
