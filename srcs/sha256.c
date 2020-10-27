@@ -6,7 +6,7 @@
 /*   By: nsondag <nsondag@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 14:50:58 by nsondag           #+#    #+#             */
-/*   Updated: 2020/10/19 13:24:09 by nsondag          ###   ########.fr       */
+/*   Updated: 2020/10/27 13:05:38 by nsondag          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ void			ft_sha256(t_all *all, uint32_t **block, int64_t len)
 {
 	int64_t		i;
 	uint32_t	*res;
-	int				to_copy;
+	int			to_copy;
 
 	i = -1;
 	init_sha256(all->vars);
@@ -103,6 +103,7 @@ void			ft_sha256(t_all *all, uint32_t **block, int64_t len)
 	{
 		if (!(block[i] = malloc(64 * sizeof(**block))))
 			return ;
+		ft_bzero(block[i], 64);
 		if (len < 64)
 			to_copy = len;
 		else

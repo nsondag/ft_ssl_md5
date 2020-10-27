@@ -43,7 +43,7 @@ int				process(char *av, t_all *all)
 		len = ft_strlen(all->message);
 	get_blocks(all, block, &len);
 	all->message[len - 1] = 0;
-	free(all->message);
+	//free(all->message);
 	if ((all->flags & R) && !(all->flags & Q) && all->av)
 	{
 		if (all->flags & S)
@@ -107,7 +107,6 @@ int				main(int argc, char **argv)
 			all.ac++;
 			dispatch(&all);
 		}
-		free(all.av);
 	}
 	if (all.flags & S && !all.ac)
 		printf("%s: option requires an argument -- s\n", all.command);
