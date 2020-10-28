@@ -30,7 +30,7 @@ static int64_t	get_message(t_all *all)
 	{
 		all->message = ft_strdup(all->av);
 		if (!(all->flags & Q) && !(all->flags & R))
-			ft_printf("%s(\"%s\")= ", all->command, all->message);
+			ft_printf("%s(\"%s\")= ", all->cmd, all->message);
 	}
 	else if ((len = parse(all->message, all->av, all)) < 0)
 	{
@@ -81,23 +81,20 @@ static int		process(t_all *all)
 
 static int		check_validity(int argc, char *argv, t_all *all)
 {
-	ft_strcpy(all->command, argv);
 	if (argc < 2)
 	{
-		ft_printf("usage: ft_ssl command [command opts] [command args]\n");
+		ft_printf("usage: ft_ssl command [-pqr] [-s string] [files ...]\n");
 		return (0);
 	}
-	else if (!is_command(all))
+	ft_strcpy(all->cmd, argv);
+	if (!is_cmd(all))
 	{
-		ft_printf("ft_ssl: Error '%s' is an invalid command.\n", argv);
-		show_commands();
+		ft_printf("ft_ssl: Error '%s' is an invalid cmd.\n", argv);
+		show_cmds();
 		return (0);
 	}
-	else
-	{
-		init_all(all);
-		return (1);
-	}
+	init_all(all);
+	return (1);
 }
 
 int				main(int argc, char **argv)
@@ -108,15 +105,12 @@ int				main(int argc, char **argv)
 	if (!check_validity(argc, argv[1], &all))
 		return (1);
 	i = 2;
-	while (i < argc)
+	while (i > 0 && i < argc)
 	{
 		if (all.av || (all.flags & P))
 			process(&all);
 		else if (*argv[i] == '-' && !(all.flags & S) && all.listen_flag)
-		{
-			if (!is_valid_flag(&all, &argv[i++][1]))
-				return (1);
-		}
+			i = is_valid_flag(&all, &argv[i++][1]);
 		else if (all.ac++)
 		{
 			if (!(all.av = malloc((ft_strlen(argv[i]) + 1) * sizeof(all.av))))
@@ -125,9 +119,9 @@ int				main(int argc, char **argv)
 			process(&all);
 		}
 	}
-	if (all.flags & S && !all.ac)
-		ft_printf("%s: option requires an argument -- s\n", all.command);
-	else if (!all.ac || all.flags & P || all.flags & S)
+	if (i > 0 && (all.flags & S && !all.ac))
+		ft_printf("%s: option requires an argument -- s\n", all.cmd);
+	else if (i > 0 && (!all.ac || all.flags & S || all.flags & P))
 		process(&all);
 	return (0);
 }

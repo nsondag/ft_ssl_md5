@@ -28,8 +28,8 @@ typedef	struct	s_all
 	int			nb_blocks;
 	char		*av;
 	int			flags;
-	char		command[32];
-	char		uppercommand[32];
+	char		cmd[32];
+	char		uppercmd[32];
 	int			listen_flag;
 	int			read_entry;
 	int			ac;
@@ -42,8 +42,8 @@ typedef	struct	s_all
 
 u_int32_t		*padding(u_int32_t *block, int64_t len, t_all *all);
 int64_t			parse(char *string, char *file, t_all *all);
-int				show_commands(void);
-int				is_command(t_all *all);
+int				show_cmds(void);
+int				is_cmd(t_all *all);
 int				is_valid_flag(t_all *all, char *av);
 void			get_blocks(t_all *all, u_int32_t	**block, int64_t *len);
 
