@@ -89,7 +89,7 @@ static int		check_validity(int argc, char *argv, t_all *all)
 	ft_strcpy(all->cmd, argv);
 	if (!is_cmd(all))
 	{
-		ft_printf("ft_ssl: Error '%s' is an invalid cmd.\n", argv);
+		ft_printf("ft_ssl: Error '%s' is an invalid command.\n", argv);
 		show_cmds();
 		return (0);
 	}
@@ -110,7 +110,7 @@ int				main(int argc, char **argv)
 		if (all.av || (all.flags & P))
 			process(&all);
 		else if (*argv[i] == '-' && !(all.flags & S) && all.listen_flag)
-			i = is_valid_flag(&all, &argv[i++][1]);
+			i = is_valid_flag(&all, &argv[i++][1]) >= 0 ? i : -1;
 		else if (all.ac++)
 		{
 			if (!(all.av = malloc((ft_strlen(argv[i]) + 1) * sizeof(all.av))))
