@@ -28,7 +28,8 @@ static int64_t	get_message(t_all *all)
 	len = 0;
 	if (all->flags & S && all->listen_flag)
 	{
-		all->message = ft_strdup(all->av);
+		if (!(all->message = ft_strdup(all->av)))
+			return (-1);
 		if (!(all->flags & Q) && !(all->flags & R))
 			ft_printf("%s(\"%s\")= ", all->cmd, all->message);
 	}
@@ -41,8 +42,7 @@ static int64_t	get_message(t_all *all)
 	else if (all->flags & P)
 	{
 		all->read_entry = 0;
-		if (all->read_entry)
-			ft_printf("\n");
+		all->read_entry ? ft_printf("\n") : 0;
 		all->flags &= ~P;
 	}
 	if (!len)
