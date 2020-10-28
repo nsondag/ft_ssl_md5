@@ -23,4 +23,5 @@ void	ft_strtoupper(void *dst, const void *src)
 	{
 		*dstc++ = ft_toupper((int)(*srcc++));
 	}
+	*dstc = 0;
 }

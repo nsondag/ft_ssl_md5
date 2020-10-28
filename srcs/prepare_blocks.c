@@ -30,7 +30,7 @@ u_int32_t	*padding(u_int32_t *block, int64_t len, t_all *all)
 	i = 0;
 	bit_len = ((u_int64_t)len - 1) * 8;
 	bit_len2 = bit_len >> 32;
-	if (ft_strequ(all->command, "SHA256"))
+	if (ft_strequ(all->uppercommand, "SHA256"))
 	{
 		bit_len = rev_int_byte(bit_len);
 		bit_len2 = rev_int_byte(bit_len2);
@@ -52,9 +52,9 @@ void		get_blocks(t_all *all, u_int32_t **block, int64_t *len)
 	if (!(block = malloc(all->nb_blocks * sizeof(*block))))
 		return ;
 	*len += 1;
-	if (ft_strequ(all->command, "MD5"))
+	if (ft_strequ(all->uppercommand, "MD5"))
 		ft_md5(all, block, *len);
-	else if (ft_strequ(all->command, "SHA256"))
+	else if (ft_strequ(all->uppercommand, "SHA256"))
 		ft_sha256(all, block, *len);
 	free(block);
 }

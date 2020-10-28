@@ -81,12 +81,13 @@ static int		process(t_all *all)
 
 static int		check_validity(int argc, char *argv, t_all *all)
 {
+	ft_strcpy(all->command, argv);
 	if (argc < 2)
 	{
 		ft_printf("usage: ft_ssl command [command opts] [command args]\n");
 		return (0);
 	}
-	else if (!is_command(argv))
+	else if (!is_command(all))
 	{
 		ft_printf("ft_ssl: Error '%s' is an invalid command.\n", argv);
 		show_commands();
@@ -95,7 +96,6 @@ static int		check_validity(int argc, char *argv, t_all *all)
 	else
 	{
 		init_all(all);
-		ft_strcpy(all->command, argv);
 		return (1);
 	}
 }
@@ -113,7 +113,10 @@ int				main(int argc, char **argv)
 		if (all.av || (all.flags & P))
 			process(&all);
 		else if (*argv[i] == '-' && !(all.flags & S) && all.listen_flag)
-			is_valid_flag(&all, &argv[i++][1]);
+		{
+			if (!is_valid_flag(&all, &argv[i++][1]))
+				return (1);
+		}
 		else if (all.ac++)
 		{
 			if (!(all.av = malloc((ft_strlen(argv[i]) + 1) * sizeof(all.av))))

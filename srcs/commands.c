@@ -35,15 +35,17 @@ int		show_commands(void)
 	return (0);
 }
 
-int		is_command(char *command)
+int		is_command(t_all *all)
 {
 	int i;
 
-	ft_strtoupper(command, command);
+	if (ft_strlen(all->command) > 32)
+		return (0);
+	ft_strtoupper(all->uppercommand, all->command);
 	i = -1;
 	while (*g_md_commands[++i])
 	{
-		if (ft_strequ(command, g_md_commands[i]))
+		if (ft_strequ(all->uppercommand, g_md_commands[i]))
 			return (1);
 	}
 	return (0);
@@ -63,16 +65,17 @@ int		is_valid_flag(t_all *all, char *av)
 			{
 				all->ac++;
 				if (!(all->av = malloc((ft_strlen(av) - i) * sizeof(*all->av))))
-					return (1);
+					return (0);
 				ft_memcpy(all->av, &av[i], ft_strlen(av) - i);
-				return (0);
+				return (1);
 			}
 		}
 		else
 		{
 			ft_printf("%s: illegal option -- %c\n", all->command, av[i]);
-			return (1);
+			ft_printf("usage: ft_ssl command [command opts] [command args]\n");
+			return (0);
 		}
 	}
-	return (0);
+	return (1);
 }
