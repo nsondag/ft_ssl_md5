@@ -45,7 +45,6 @@ u_int32_t	*padding(u_int32_t *block, int64_t len, t_all *all)
 void		get_blocks(t_all *all, u_int32_t **block, int64_t *len)
 {
 	all->message[*len] = (unsigned char)128;
-	all->message[*len + 1] = 0;
 	all->nb_blocks = *len / 64 + 1;
 	if (*len % 64 >= 56)
 		all->nb_blocks++;
