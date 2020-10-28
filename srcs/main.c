@@ -25,6 +25,7 @@ static int64_t	get_message(t_all *all)
 {
 	int64_t	len;
 
+	len = 0;
 	if (all->flags & S && all->listen_flag)
 	{
 		all->message = ft_strdup(all->av);
@@ -51,11 +52,11 @@ static int64_t	get_message(t_all *all)
 
 static int		process(t_all *all)
 {
-	u_int32_t	*result;
 	u_int32_t	**block;
 	int64_t		len;
 	char		*string;
 
+	block = NULL;
 	string = NULL;
 	if ((len = get_message(all)) < 0)
 		return (0);
