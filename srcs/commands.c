@@ -65,7 +65,7 @@ int		is_valid_flag(t_all *all, char *av)
 			{
 				all->ac++;
 				if (!(all->av = malloc((ft_strlen(av) - i) * sizeof(*all->av))))
-					return (0);
+					return (-1);
 				ft_memcpy(all->av, &av[i], ft_strlen(av) - i);
 				return (1);
 			}
