@@ -64,31 +64,31 @@ int64_t	read_all(char **str, int fd)
 	return (index);
 }
 
-int64_t	parse(char *string, char *f, t_all *all)
+int64_t	parse(char *string, char *f, t_all *a)
 {
 	int		fd;
 	int64_t len;
 
 	len = 0;
 	errno = 0;
-	if (all->flags & P || (all->read_entry && !f))
+	if (a->flags & P || (a->read_entry && !f))
 		fd = 0;
 	else if (f)
 	{
 		fd = open(f, O_RDONLY);
-		all->listen_flag = 0;
+		a->listen_flag = 0;
 	}
 	if (errno)
-		return (-ft_printf("%s: %s: %s\n", all->cmd, f, strerror(errno)));
+		return (-ft_printf("ft_ssl: %s: %s: %s\n", a->cmd, f, strerror(errno)));
 	len = read_all(&string, fd);
 	close(fd);
 	if (errno && errno != 9)
-		return (-ft_printf("%s: %s: %s\n", all->cmd, f, strerror(errno)));
-	if ((!(all->flags & Q) && !(all->flags & R)) && f)
-		ft_printf("%s(%s)= ", all->cmd, f);
-	if ((string && all->flags & P) && (!(all->flags & Q) && !(all->flags & R))
+		return (-ft_printf("ft_ssl: %s: %s: %s\n", a->cmd, f, strerror(errno)));
+	if ((!(a->flags & Q) && !(a->flags & R)) && f)
+		ft_printf("%s(%s)= ", a->cmd, f);
+	if ((string && a->flags & P) && (!(a->flags & Q) && !(a->flags & R))
 			&& !f)
 		ft_printf("%s", string);
-	all->message = string;
+	a->message = string;
 	return (len);
 }
