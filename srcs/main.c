@@ -14,6 +14,7 @@
 
 static void		init_all(t_all *all)
 {
+	all->fd = 0;
 	all->flags = 0;
 	all->av = NULL;
 	all->listen_flag = 1;

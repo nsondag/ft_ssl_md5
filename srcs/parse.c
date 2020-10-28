@@ -66,28 +66,27 @@ int64_t	read_all(char **str, int fd)
 
 int64_t	parse(char *string, char *f, t_all *a)
 {
-	int		fd;
 	int64_t len;
 
 	len = 0;
 	errno = 0;
-	if (a->flags & P || (a->read_entry && !f))
-		fd = 0;
-	else if (f)
+	if (f && !(a->flags & P) && !(a->read_entry && !f))
 	{
-		fd = open(f, O_RDONLY);
+		a->fd = open(f, O_RDONLY);
 		a->listen_flag = 0;
 	}
 	if (errno)
 		return (-ft_printf("ft_ssl: %s: %s: %s\n", a->cmd, f, strerror(errno)));
-	len = read_all(&string, fd);
-	close(fd);
+	len = read_all(&string, a->fd);
+	close(a->fd);
 	if (errno && errno != 9)
+	{
+		free(string);
 		return (-ft_printf("ft_ssl: %s: %s: %s\n", a->cmd, f, strerror(errno)));
+	}
 	if ((!(a->flags & Q) && !(a->flags & R)) && f)
 		ft_printf("%s(%s)= ", a->cmd, f);
-	if ((string && a->flags & P) && (!(a->flags & Q) && !(a->flags & R))
-			&& !f)
+	if ((string && a->flags & P) && !f)
 		ft_printf("%s", string);
 	a->message = string;
 	return (len);

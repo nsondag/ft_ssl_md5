@@ -24,6 +24,7 @@
 
 typedef	struct	s_all
 {
+	int			fd;
 	char		*message;
 	int			nb_blocks;
 	char		*av;
