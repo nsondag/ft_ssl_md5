@@ -82,7 +82,7 @@ int64_t	parse(char *string, char *f, t_all *all)
 		return (-ft_printf("%s: %s: %s\n", all->command, f, strerror(errno)));
 	len = read_all(&string, fd);
 	close(fd);
-	if (errno)
+	if (errno && errno != 9)
 		return (-ft_printf("%s: %s: %s\n", all->command, f, strerror(errno)));
 	if ((!(all->flags & Q) && !(all->flags & R)) && f)
 		ft_printf("%s(%s)= ", all->command, f);
