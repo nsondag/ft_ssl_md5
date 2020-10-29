@@ -35,12 +35,13 @@ int		show_cmds(void)
 	return (0);
 }
 
-int		is_cmd(t_all *all)
+int		is_cmd(t_all *all, char *av)
 {
 	int i;
 
-	if (ft_strlen(all->cmd) > 32)
+	if (ft_strlen(av) > 32)
 		return (0);
+	ft_strcpy(all->cmd, av);
 	ft_strtoupper(all->uppercmd, all->cmd);
 	i = -1;
 	while (*g_md_cmds[++i])

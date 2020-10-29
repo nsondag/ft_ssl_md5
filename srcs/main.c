@@ -85,8 +85,7 @@ static int		check_validity(int argc, char *argv, t_all *all)
 		ft_printf("usage: ft_ssl command [-pqr] [-s string] [files ...]\n");
 		return (0);
 	}
-	ft_strcpy(all->cmd, argv);
-	if (!is_cmd(all))
+	if (!is_cmd(all, argv))
 	{
 		ft_printf("ft_ssl: Error '%s' is an invalid command.\n", argv);
 		show_cmds();
