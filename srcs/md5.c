@@ -104,16 +104,14 @@ void				ft_md5(t_all *all, u_int32_t **block, int64_t len)
 	int			to_copy;
 
 	i = -1;
+	res = NULL;
 	init_md5(all->vars);
 	while (++i < all->nb_blocks)
 	{
 		if (!(block[i] = malloc(64 * sizeof(**block))))
 			return ;
 		ft_bzero(block[i], 64);
-		if (len < 64)
-			to_copy = len;
-		else
-			to_copy = 64;
+		to_copy = len < 64 ? len : 64;
 		ft_memcpy(block[i], all->message + (i * 64), to_copy);
 		if (i == all->nb_blocks - 1)
 			block[i] = padding(block[i], len, all);
@@ -122,5 +120,8 @@ void				ft_md5(t_all *all, u_int32_t **block, int64_t len)
 	}
 	i = -1;
 	while (++i < 4)
-		ft_printf("%08x", rev_int_byte(res[i]));
+	{
+		res[i] = rev_int_byte(res[i]);
+		ft_printf("%08x", res[i]);
+	}
 }

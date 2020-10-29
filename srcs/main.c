@@ -55,10 +55,8 @@ static int		process(t_all *all)
 {
 	u_int32_t	**block;
 	int64_t		len;
-	char		*string;
 
 	block = NULL;
-	string = NULL;
 	if ((len = get_message(all)) < 0)
 		return (0);
 	get_blocks(all, block, &len);
